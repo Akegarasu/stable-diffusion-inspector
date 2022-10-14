@@ -4,4 +4,4 @@
 
 ## 说明
 
-modified from [imagemeta]()
+modified from [imagemeta](https://github.com/seanghay/imagemeta)

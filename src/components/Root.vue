@@ -60,7 +60,7 @@
     <div class="my-4 pt-4">
       <a
         class="inline-block text-sm text-gray-500"
-        href="https://github.com/Akegarasu/imagemeta"
+        href="https://github.com/Akegarasu/novelai-tagreader"
         >View on GitHub</a
       >
       <br />
