@@ -1,0 +1,31 @@
+{
+  "name": "novelai-tagreader",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "GPL-v3",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "browser-image-compression": "^2.0.0",
+    "exifreader": "^4.5.0",
+    "file-saver": "^2.0.5",
+    "file-type": "^17.1.4",
+    "mime-types": "^2.1.35",
+    "png-chunk-text": "^1.0.0",
+    "png-chunks-extract": "^1.0.0",
+    "png-metadata": "^1.0.2",
+    "pretty-bytes": "^6.0.0",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.5",
+    "@types/mime-types": "^2.1.1",
+    "@vitejs/plugin-vue": "^3.0.0",
+    "unocss": "^0.44.7",
+    "vite": "^3.0.0"
+  }
+}
