@@ -87,9 +87,8 @@ import { computed, ref, watch } from "vue";
 import prettyBytes from "pretty-bytes";
 import imageCompression from "browser-image-compression";
 import { saveAs } from "file-saver";
-import * as metadata from "png-metadata";
-import * as extract from "png-chunks-extract";
-import * as text from "png-chunk-text";
+import extractChunks from "png-chunks-extract";
+import text from "png-chunk-text";
 
 const fileRef = ref(null);
 const imageRef = ref(null);
@@ -121,7 +120,7 @@ watch(fileRef, () => {
 
 async function readNovelaiTag(file) {
   const buf = await file.arrayBuffer();
-  const chunks = extract(new Uint8Array(buf));
+  const chunks = extractChunks(new Uint8Array(buf));
   const textChunks = chunks
     .filter(function (chunk) {
       return chunk.name === "tEXt";
@@ -142,15 +141,15 @@ async function readFileInfo() {
     ...nai.map((v, k) => {
       return {
         key: v.keyword,
-        value: v.text
-      }
-    })
+        value: v.text,
+      };
+    }),
   ];
-  if(nai.length==0){
+  if (nai.length == 0) {
     fileInfoRef.value.push({
       key: "提示",
-      value:  "这可能不是一张NovelAI生成的图或者不是原图经过压缩",
-    })
+      value: "这可能不是一张NovelAI生成的图或者不是原图经过压缩",
+    });
   }
 }
 
