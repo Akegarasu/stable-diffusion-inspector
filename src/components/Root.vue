@@ -121,6 +121,9 @@ async function readNovelaiTag(file) {
 async function readFileInfo() {
   const file = fileRef.value;
   let nai = await readNovelaiTag(file);
+  if (nai.length == 1) {
+    nai = await handleWebUiTag(nai[0]);
+  }
   fileInfoRef.value = [
     { key: "文件名", value: file.name },
     { key: "文件大小", value: prettyBytes(file.size) },
@@ -134,9 +137,28 @@ async function readFileInfo() {
   if (nai.length == 0) {
     fileInfoRef.value.push({
       key: "提示",
-      value: "这可能不是一张NovelAI生成的图或者不是原图经过压缩",
+      value: "这可能不是一张NovelAI生成的图或者不是原图, 经过了压缩",
     });
   }
+}
+
+async function handleWebUiTag(data) {
+  let promptSplit = data.text.split("Negative prompt: ");
+  let otherSplit = promptSplit[1].split("Steps: ");
+  return [
+    {
+      keyword: "提示词",
+      text: promptSplit[0],
+    },
+    {
+      keyword: "负面提示词",
+      text: otherSplit[0],
+    },
+    {
+      keyword: "其他参数",
+      text: "Steps: " + otherSplit[1],
+    },
+  ];
 }
 
 function readImageBase64() {
