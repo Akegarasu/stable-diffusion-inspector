@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.0.10",
     "browser-image-compression": "^2.0.0",
+    "element-plus": "^2.2.18",
     "exifreader": "^4.5.0",
     "file-saver": "^2.0.5",
     "file-type": "^17.1.4",

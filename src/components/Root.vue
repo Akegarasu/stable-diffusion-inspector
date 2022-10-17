@@ -4,15 +4,16 @@
     <p class="text-gray-500 my-2 text-sm">
       从 NovelAI 生成的图片读取内嵌的 prompt
     </p>
-    <button
-      @click="
-        $refs.imageInput.value = null;
-        $refs.imageInput.click();
-      "
-      class="bg-gray-500 cursor-pointer text-white rounded border-none px-3 py-2"
+    <el-upload
+      class="upload-demo"
+      accept="image/*"
+      drag
+      multiple
+      :before-upload="handleUpload"
     >
-      选择文件
-    </button>
+      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+      <div class="el-upload__text">拖动文件到这里或者点击上传</div>
+    </el-upload>
     <div v-if="fileRef" class="my-6">
       <div
         class="bg-white max-w-720px mx-auto border border-gray-300 p-2"
@@ -56,7 +57,9 @@
         </div>
       </div>
     </div>
-
+    <p class="text-gray-500 my-2 text-sm">
+      *运算完全在你的电脑上运行不会上传图片到云端！
+    </p>
     <div class="my-4 pt-4">
       <a
         class="inline-block text-sm text-gray-500"
@@ -72,44 +75,21 @@
       </span>
     </div>
   </div>
-  <input
-    @change="onImageFileChange"
-    ref="imageInput"
-    type="file"
-    accept="image/*"
-    hidden
-  />
 </template>
 
 <script setup>
 import ExifReader from "exifreader";
 import { computed, ref, watch } from "vue";
 import prettyBytes from "pretty-bytes";
-import imageCompression from "browser-image-compression";
-import { saveAs } from "file-saver";
 import extractChunks from "png-chunks-extract";
 import text from "png-chunk-text";
+import { UploadFilled } from "@element-plus/icons-vue";
 
 const fileRef = ref(null);
 const imageRef = ref(null);
 const exifRef = ref(null);
 const fileInfoRef = ref(null);
 const imageMaxSizeRef = ref(0);
-const compressionFormatRef = ref("image/jpeg");
-const isExporting = ref(false);
-
-const mimeTypeMap = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/webp": "webp",
-  "image/gif": "gif",
-  "image/avif": "avif",
-};
-
-const supportedCompressionTypes = ref(Object.keys(mimeTypeMap));
-const compressFormatExt = computed(
-  () => mimeTypeMap[compressionFormatRef.value]
-);
 
 watch(fileRef, () => {
   if (!fileRef.value) return;
@@ -117,6 +97,12 @@ watch(fileRef, () => {
   readExif();
   readFileInfo();
 });
+
+async function handleUpload(file) {
+  console.log(file);
+  fileRef.value = file;
+  return false;
+}
 
 async function readNovelaiTag(file) {
   const buf = await file.arrayBuffer();
@@ -178,29 +164,5 @@ async function readExif() {
   const data = await ExifReader.load(file);
   const entries = Object.entries(data);
   exifRef.value = entries.map(([key, value]) => ({ key, value }));
-}
-
-function onImageFileChange(e) {
-  fileRef.value = e.target.files[0];
-}
-
-async function compressFile() {
-  const file = fileRef.value;
-  if (!file) return;
-  isExporting.value = true;
-  const maxSize = isNaN(imageMaxSizeRef.value)
-    ? Number.POSITIVE_INFINITY
-    : parseInt(imageMaxSizeRef.value);
-
-  const result = await imageCompression(file, {
-    maxWidthOrHeight: maxSize,
-    fileType: compressionFormatRef.value,
-  });
-
-  const output = prettyBytes(result.size);
-  console.log(`size=${output}`);
-  const filename = file.name.split(".").slice(0, -1).join(".");
-  await saveAs(result, filename + `.${compressFormatExt.value}`);
-  isExporting.value = false;
 }
 </script>
