@@ -109,9 +109,17 @@ async function readNovelaiTag(file) {
   const chunks = extractChunks(new Uint8Array(buf));
   const textChunks = chunks
     .filter(function (chunk) {
-      return chunk.name === "tEXt";
+      return chunk.name === "tEXt" || chunk.name === "iTXt";
     })
     .map(function (chunk) {
+      if (chunk.name === "iTXt") {
+        let data = chunk.data.filter((x) => x != 0x0);
+        let txt = new TextDecoder().decode(data);
+        return {
+          keyword: "信息",
+          text: txt.slice(11),
+        };
+      }
       return text.decode(chunk.data);
     });
   console.log(textChunks);
