@@ -39,6 +39,10 @@
           <p class="text-wrap break-all text-sm mt-1 text-gray-600">
             {{ item.value }}
           </p>
+          <json-viewer
+            :value="jsonData"
+            v-if="item.key == 'Comment'"
+          ></json-viewer>
         </div>
       </div>
 
@@ -83,12 +87,14 @@ import { computed, ref, watch } from "vue";
 import prettyBytes from "pretty-bytes";
 import extractChunks from "png-chunks-extract";
 import text from "png-chunk-text";
+import jsonViewer from "vue-json-viewer";
 import { UploadFilled } from "@element-plus/icons-vue";
 
 const fileRef = ref(null);
 const imageRef = ref(null);
 const exifRef = ref(null);
 const fileInfoRef = ref(null);
+const jsonData = ref(null);
 const imageMaxSizeRef = ref(0);
 
 watch(fileRef, () => {
@@ -136,6 +142,9 @@ async function readFileInfo() {
     { key: "文件名", value: file.name },
     { key: "文件大小", value: prettyBytes(file.size) },
     ...nai.map((v, k) => {
+      if (v.keyword == "Comment") {
+        jsonData.value = JSON.parse(v.text);
+      }
       return {
         key: v.keyword,
         value: v.text,
