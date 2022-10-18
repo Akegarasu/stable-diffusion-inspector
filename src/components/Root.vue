@@ -62,19 +62,24 @@
       </div>
     </div>
     <p class="text-gray-500 my-2 text-sm">
-      *运算完全在你的电脑上运行不会上传图片到云端！
+      *运算完全在你的电脑上运行不会上传图片到云端
     </p>
     <div class="my-4 pt-4">
+      如果您觉得本项目对您有帮助 请在 →
       <a
         class="inline-block text-sm text-gray-500"
         href="https://github.com/Akegarasu/novelai-tagreader"
-        >View on GitHub</a
-      >
+        >GitHub</a>
+        ←上点个star
       <br />
       <span class="inline-block mt-2 text-sm text-gray-500">
         Made with ❤️ by
         <a class="text-gray-500" href="https://github.com/Akegarasu"
           >@Akegarasu</a
+        >
+        <a> | </a>
+        <a class="text-gray-500" href="https://space.bilibili.com/12566101"
+          >bilibili@秋葉aaaki</a
         >
       </span>
     </div>
