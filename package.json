@@ -20,6 +20,7 @@
     "png-chunks-extract": "^1.0.0",
     "pretty-bytes": "^6.0.0",
     "vue": "^3.2.37",
+    "vue-clipboard3": "^2.0.0",
     "vue-json-viewer": "^3.0.4"
   },
   "devDependencies": {

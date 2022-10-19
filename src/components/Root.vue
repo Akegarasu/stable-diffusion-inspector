@@ -35,8 +35,29 @@
           v-for="(item, index) in fileInfoRef"
           :key="item.key"
         >
-          <h1 class="font-semibold text-sm text-gray-800">{{ item.key }}</h1>
-          <p class="text-wrap break-all text-sm mt-1 text-gray-600">
+          <h1 class="font-semibold text-sm text-gray-800">
+            {{ item.key }}
+            <el-popover
+              placement="top-start"
+              trigger="hover"
+              content="点击复制"
+              style="min-width: 10px;"
+              v-if="showCopyBtn(item.key)"
+            >
+              <template #reference>
+                <el-button
+                  style="margin-left: 6px"
+                  :icon="CopyDocument"
+                  :link="true"
+                  @click="copy(item.value)"
+                />
+              </template>
+            </el-popover>
+          </h1>
+          <p
+            class="text-wrap break-all text-sm mt-1 text-gray-600"
+            v-if="item.key != 'Comment'"
+          >
             {{ item.value }}
           </p>
           <json-viewer
@@ -70,7 +91,7 @@
         class="inline-block text-sm text-gray-500"
         href="https://github.com/Akegarasu/novelai-tagreader"
         >GitHub</a>
-        ←上点个star
+      ←上点个star
       <br />
       <span class="inline-block mt-2 text-sm text-gray-500">
         Made with ❤️ by
@@ -87,13 +108,15 @@
 </template>
 
 <script setup>
+import { ElMessage } from "element-plus";
 import ExifReader from "exifreader";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import prettyBytes from "pretty-bytes";
 import extractChunks from "png-chunks-extract";
 import text from "png-chunk-text";
 import jsonViewer from "vue-json-viewer";
-import { UploadFilled } from "@element-plus/icons-vue";
+import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
+import useClipboard from "vue-clipboard3";
 
 const fileRef = ref(null);
 const imageRef = ref(null);
@@ -101,6 +124,7 @@ const exifRef = ref(null);
 const fileInfoRef = ref(null);
 const jsonData = ref(null);
 const imageMaxSizeRef = ref(0);
+const { toClipboard } = useClipboard();
 
 watch(fileRef, () => {
   if (!fileRef.value) return;
@@ -108,6 +132,29 @@ watch(fileRef, () => {
   readExif();
   readFileInfo();
 });
+
+const copy = (value) => {
+  try {
+    toClipboard(value);
+    ElMessage({
+      message: "复制成功",
+      type: "success",
+    });
+  } catch (e) {
+    console.log(e);
+    ElMessage({
+      message: "复制失败",
+      type: "warning",
+    });
+  }
+};
+
+const showCopyBtn = (title) => {
+  if (title == "Description" || title.indexOf("提示词") != -1) {
+    return true;
+  }
+  return false;
+};
 
 async function handleUpload(file) {
   console.log(file);
