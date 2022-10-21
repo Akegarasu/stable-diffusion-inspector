@@ -162,7 +162,7 @@ async function handleUpload(file) {
   return false;
 }
 
-async function readNovelaiTag(file) {
+async function readNovelAITag(file) {
   const buf = await file.arrayBuffer();
   let chunks = [];
   try {
@@ -191,7 +191,7 @@ async function readNovelaiTag(file) {
 
 async function readFileInfo() {
   const file = fileRef.value;
-  let nai = await readNovelaiTag(file);
+  let nai = await readNovelAITag(file);
   if (nai.length == 1) {
     nai = await handleWebUiTag(nai[0]);
   }
