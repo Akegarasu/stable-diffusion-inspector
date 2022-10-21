@@ -164,7 +164,12 @@ async function handleUpload(file) {
 
 async function readNovelaiTag(file) {
   const buf = await file.arrayBuffer();
-  const chunks = extractChunks(new Uint8Array(buf));
+  let chunks = [];
+  try {
+    chunks = extractChunks(new Uint8Array(buf))
+  } catch (err) {
+    return chunks;
+  }
   const textChunks = chunks
     .filter(function (chunk) {
       return chunk.name === "tEXt" || chunk.name === "iTXt";
