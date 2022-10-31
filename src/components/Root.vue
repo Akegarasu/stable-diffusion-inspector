@@ -30,7 +30,7 @@
         <div class="el-upload__text">拖动文件到这里或者点击上传</div>
       </el-upload>
     </div>
-    
+
     <div v-if="fileRef" class="my-6">
       <div v-if="fileInfoRef" class="mt-4 text-left max-w-740px mx-auto">
         <h1 class="font-bold text-2xl mb-4">图片信息</h1>
@@ -45,7 +45,7 @@
             <el-popover
               placement="top-start"
               trigger="hover"
-              content="点击复制"
+              content="点击复制TAG"
               style="min-width: 10px"
               v-if="showCopyBtn(item.key)"
             >
@@ -54,7 +54,9 @@
                   style="margin-left: 6px"
                   :icon="CopyDocument"
                   :link="true"
-                  @click="copy(item.value)"
+                  @click="
+                    item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
+                  "
                 />
               </template>
             </el-popover>
@@ -160,7 +162,11 @@ const copy = (value) => {
 };
 
 const showCopyBtn = (title) => {
-  if (title == "Description" || title.indexOf("提示词") != -1) {
+  if (
+    title == "Description" ||
+    title == "Comment" ||
+    title.indexOf("提示词") != -1
+  ) {
     return true;
   }
   return false;
