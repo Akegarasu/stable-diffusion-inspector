@@ -4,16 +4,6 @@
     <p class="text-gray-500 my-2 text-sm">
       从 NovelAI 生成的图片读取内嵌的 prompt
     </p>
-    <el-upload
-      class="upload-demo"
-      accept="image/*"
-      drag
-      multiple
-      :before-upload="handleUpload"
-    >
-      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-      <div class="el-upload__text">拖动文件到这里或者点击上传</div>
-    </el-upload>
     <div v-if="fileRef" class="my-6">
       <div
         class="bg-white max-w-720px mx-auto border border-gray-300 p-2"
@@ -26,7 +16,22 @@
           style="display: block; width: 100%; height: auto"
         />
       </div>
+    </div>
 
+    <div class="w-740px" style="margin: 0 auto">
+      <el-upload
+        class="upload-demo"
+        accept="image/*"
+        drag
+        multiple
+        :before-upload="handleUpload"
+      >
+        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+        <div class="el-upload__text">拖动文件到这里或者点击上传</div>
+      </el-upload>
+    </div>
+    
+    <div v-if="fileRef" class="my-6">
       <div v-if="fileInfoRef" class="mt-4 text-left max-w-740px mx-auto">
         <h1 class="font-bold text-2xl mb-4">图片信息</h1>
         <div
@@ -41,7 +46,7 @@
               placement="top-start"
               trigger="hover"
               content="点击复制"
-              style="min-width: 10px;"
+              style="min-width: 10px"
               v-if="showCopyBtn(item.key)"
             >
               <template #reference>
@@ -56,7 +61,7 @@
           </h1>
           <p
             class="text-wrap break-all text-sm mt-1 text-gray-600"
-            style="white-space: pre-wrap;"
+            style="white-space: pre-wrap"
             v-if="item.key != 'Comment'"
           >
             {{ item.value }}
@@ -77,7 +82,10 @@
           :key="item.key"
         >
           <h1 class="font-semibold text-sm text-gray-800">{{ item.key }}</h1>
-          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap;">
+          <p
+            class="text-wrap break-all text-sm mt-1 text-gray-600"
+            style="white-space: pre-wrap"
+          >
             {{ item.value.description }}
           </p>
         </div>
@@ -91,7 +99,8 @@
       <a
         class="inline-block text-sm text-gray-500"
         href="https://github.com/Akegarasu/novelai-tagreader"
-        >GitHub</a>
+        >GitHub</a
+      >
       ←上点个star
       <br />
       <span class="inline-block mt-2 text-sm text-gray-500">
@@ -167,7 +176,7 @@ async function readNovelAITag(file) {
   const buf = await file.arrayBuffer();
   let chunks = [];
   try {
-    chunks = extractChunks(new Uint8Array(buf))
+    chunks = extractChunks(new Uint8Array(buf));
   } catch (err) {
     return chunks;
   }
