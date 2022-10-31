@@ -56,6 +56,7 @@
           </h1>
           <p
             class="text-wrap break-all text-sm mt-1 text-gray-600"
+            style="white-space: pre-wrap;"
             v-if="item.key != 'Comment'"
           >
             {{ item.value }}
@@ -76,7 +77,7 @@
           :key="item.key"
         >
           <h1 class="font-semibold text-sm text-gray-800">{{ item.key }}</h1>
-          <p class="text-wrap break-all text-sm mt-1 text-gray-600">
+          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap;">
             {{ item.value.description }}
           </p>
         </div>
