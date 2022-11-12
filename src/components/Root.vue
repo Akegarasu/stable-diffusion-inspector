@@ -196,7 +196,7 @@ async function readNovelAITag(file) {
         let txt = new TextDecoder().decode(data);
         return {
           keyword: "信息",
-          text: txt.slice(11),
+          text: txt.slice(10),
         };
       }
       return text.decode(chunk.data);
