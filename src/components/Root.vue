@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div class="w-740px" style="margin: 0 auto">
+    <div class="max-w-740px" style="margin: 0 auto">
       <el-upload
         class="upload-demo"
         accept="image/*"
