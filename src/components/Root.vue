@@ -235,10 +235,7 @@ async function readFileInfo() {
 async function handleWebUiTag(data) {
   let [prompts, otherParas] = data.text.split("Steps: ");
   let promptSplit = prompts.split("Negative prompt: ");
-  let negativePrompt = "无";
-  if (promptSplit.length > 1) {
-    negativePrompt = promptSplit[1];
-  }
+  let negativePrompt = promptSplit.length > 1 ? promptSplit[1] : "无";
   return [
     {
       keyword: "提示词",
