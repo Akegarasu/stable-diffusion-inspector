@@ -233,8 +233,12 @@ async function readFileInfo() {
 }
 
 async function handleWebUiTag(data) {
-  let promptSplit = data.text.split("Negative prompt: ");
-  let otherSplit = promptSplit[1].split("Steps: ");
+  let [prompts, otherParas] = data.text.split("Steps: ");
+  let promptSplit = prompts.split("Negative prompt: ");
+  let negativePrompt = "无";
+  if (promptSplit.length > 1) {
+    negativePrompt = promptSplit[1];
+  }
   return [
     {
       keyword: "提示词",
@@ -242,11 +246,11 @@ async function handleWebUiTag(data) {
     },
     {
       keyword: "负面提示词",
-      text: otherSplit[0],
+      text: negativePrompt,
     },
     {
       keyword: "其他参数",
-      text: "Steps: " + otherSplit[1],
+      text: "Steps: " + otherParas,
     },
   ];
 }
