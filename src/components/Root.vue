@@ -56,7 +56,7 @@
     </div>
 
     <div v-if="modelFileRef" class="my-6">
-      <div v-if="modelFileInfoRef" class="mt-4 text-left max-w-740px mx-auto">
+      <div class="mt-4 text-left max-w-740px mx-auto">
         <h1 class="font-bold text-2xl mb-4">模型信息</h1>
         <div :class="[index === 0 && 'border-t border-t-gray-300']"
           class="bg-white border-b border-l border-r px-4 border-b-gray-300 border-l-gray-300 border-r-gray-300 py-2"
@@ -71,7 +71,9 @@
           <json-viewer :value="jsonData" v-if="item.k == 'Info'"></json-viewer>
         </div>
       </div>
-      <a class="text-gray-500" href="https://www.bilibili.com/read/cv21362202" target="_blank">图文详解！最全模型用法</a>
+      <div class="my-4 pt-4">
+        <a class="text-gray-500" href="https://www.bilibili.com/read/cv21362202" target="_blank">图文详解！最全模型用法</a>
+      </div>
     </div>
 
     <p class="text-gray-500 my-2 text-sm">
@@ -270,6 +272,7 @@ const readNovelAITag = async (file) => {
 }
 
 async function readFileInfo(file) {
+  jsonData.value = null
   let nai = await readNovelAITag(file)
   if (nai.length == 1) {
     nai = await handleWebUiTag(nai[0])
