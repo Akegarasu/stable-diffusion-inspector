@@ -71,6 +71,7 @@
           <json-viewer :value="jsonData" v-if="item.k == 'Info'"></json-viewer>
         </div>
       </div>
+      <a class="text-gray-500" href="https://www.bilibili.com/read/cv21362202" target="_blank">图文详解！最全模型用法</a>
     </div>
 
     <p class="text-gray-500 my-2 text-sm">
@@ -176,7 +177,7 @@ async function handleUpload(file) {
     guessModel(file)
   } else {
     imgFileRef.value = file;
-    modelFileInfoRef.value = null
+    modelFileRef.value = null
     readImageBase64()
     exifRef.value = await readExif()
     imgfileInfoRef.value = await readFileInfo(file)
