@@ -78,7 +78,7 @@
     </p>
     <div class="my-4 pt-4">
       如果您觉得本项目对您有帮助 请在 →
-      <a class="inline-block text-sm text-gray-500" href="https://github.com/Akegarasu/novelai-tagreader">GitHub</a>
+      <a class="inline-block text-sm text-gray-500" href="https://github.com/Akegarasu/stable-diffusion-inspector">GitHub</a>
       ←上点个star
       <br />
       <span class="inline-block mt-2 text-sm text-gray-500">
