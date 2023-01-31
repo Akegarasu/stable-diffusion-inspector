@@ -81,7 +81,8 @@
     </p>
     <div class="my-4 pt-4">
       如果您觉得本项目对您有帮助 请在 →
-      <a class="inline-block text-sm text-gray-500" href="https://github.com/Akegarasu/stable-diffusion-inspector">GitHub</a>
+      <a class="inline-block text-sm text-gray-500"
+        href="https://github.com/Akegarasu/stable-diffusion-inspector">GitHub</a>
       ←上点个star
       <br />
       <span class="inline-block mt-2 text-sm text-gray-500">
@@ -119,7 +120,7 @@ const jsonData = ref(null);
 const imageMaxSizeRef = ref(0);
 const { toClipboard } = useClipboard();
 
-const availableImgExt = ["png", "jpeg", "jpg", "webp"]
+const availableImgExt = ["png", "jpeg", "jpg", "webp", "bmp"]
 const availableModelExt = ["pt", "ckpt", "safetensors"]
 
 const modelSig = {
@@ -172,22 +173,31 @@ const showCopyBtn = (title) => {
 
 async function handleUpload(file) {
   console.log(file);
-  let fileExt = file.name.split(".").pop();
+  let fileExt = file.name.split(".").pop().toLowerCase();
+  imgFileRef.value = null
+  modelFileRef.value = null
   if (availableModelExt.indexOf(fileExt) != -1) {
     modelFileRef.value = file
-    imgFileRef.value = null
-    guessModel(file)
-  } else {
+    inspectModel(file)
+  } else if (availableImgExt.indexOf(fileExt) != -1) {
     imgFileRef.value = file;
-    modelFileRef.value = null
-    readImageBase64()
-    exifRef.value = await readExif()
-    imgfileInfoRef.value = await readFileInfo(file)
+    inspectImage(file)
+  } else {
+    ElMessage({
+      message: "解析失败，该文件可能不是一个正常的图片/模型文件。",
+      type: "error",
+    });
   }
   return false;
 }
 
-const guessModel = (file) => {
+const inspectImage = async (file) => {
+  readImageBase64()
+  exifRef.value = await readExif(file)
+  imgfileInfoRef.value = await readFileInfo(file)
+}
+
+const inspectModel = async (file) => {
   const rd = new FileReader();
   rd.readAsBinaryString(file.slice(0, 1024 * 5));
   rd.onload = function (readRes) {
@@ -339,8 +349,7 @@ const readImageBase64 = () => {
   };
 }
 
-const readExif = async () => {
-  const file = imgFileRef.value;
+const readExif = async (file) => {
   const data = await ExifReader.load(file);
   const entries = Object.entries(data);
   return entries.map(([key, value]) => ({ key, value }));
