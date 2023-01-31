@@ -11,9 +11,9 @@ export default defineConfig({
     VitePWA({
        includeAssets: ['favicon.ico','apple-touch-icon.png'],
        manifest: {
-        name: 'NovelAI 法术解析',
-        short_name: 'novelai-tagreader',
-        description: '从 novelai 生成的图片中读取 pnginfo 来获取生成的参数',
+        name: 'Stable Diffusion 法术解析',
+        short_name: 'stable-diffusion-inspector',
+        description: '从 sd 生成的图片中读取 pnginfo 来获取生成的参数 / 解析 sd 模型',
         theme_color: 'floralwhite',
         icons: [
           {

@@ -1,119 +1,93 @@
 <template>
   <div class="text-center p-6 max-w-1024px mx-auto">
-    <h1 class="font-bold text-3xl">NovelAI 法术解析</h1>
+    <h1 class="font-bold text-3xl">Stable Diffusion 法术解析</h1>
     <p class="text-gray-500 my-2 text-sm">
-      从 NovelAI 生成的图片读取内嵌的 prompt
+      从 Stable Diffusion 生成的图片读取 prompt / Stable Diffusion 模型解析
     </p>
-    <div v-if="fileRef" class="my-6">
-      <div
-        class="bg-white max-w-720px mx-auto border border-gray-300 p-2"
-        v-if="imageRef"
-      >
-        <img
-          v-if="imageRef"
-          v-bind="imageRef"
-          alt=""
-          style="display: block; width: 100%; height: auto"
-        />
+    <div v-if="imgFileRef" class="my-6">
+      <div class="bg-white max-w-720px mx-auto border border-gray-300 p-2" v-if="imageRef">
+        <img v-if="imageRef" v-bind="imageRef" alt="" style="display: block; width: 100%; height: auto" />
       </div>
     </div>
 
     <div class="max-w-740px" style="margin: 0 auto">
-      <el-upload
-        class="upload-demo"
-        accept="image/*"
-        drag
-        multiple
-        :before-upload="handleUpload"
-      >
+      <el-upload class="upload-demo" drag multiple :before-upload="handleUpload">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">拖动文件到这里或者点击上传</div>
+        <div class="el-upload__text">拖动文件到这里或者点击选择文件</div>
       </el-upload>
     </div>
 
-    <div v-if="fileRef" class="my-6">
-      <div v-if="fileInfoRef" class="mt-4 text-left max-w-740px mx-auto">
+    <div v-if="imgFileRef" class="my-6">
+      <div v-if="imgfileInfoRef" class="mt-4 text-left max-w-740px mx-auto">
         <h1 class="font-bold text-2xl mb-4">图片信息</h1>
-        <div
-          :class="[index === 0 && 'border-t border-t-gray-300']"
+        <div :class="[index === 0 && 'border-t border-t-gray-300']"
           class="bg-white border-b border-l border-r px-4 border-b-gray-300 border-l-gray-300 border-r-gray-300 py-2"
-          v-for="(item, index) in fileInfoRef"
-          :key="item.key"
-        >
+          v-for="(item, index) in imgfileInfoRef" :key="item.key">
           <h1 class="font-semibold text-sm text-gray-800">
             {{ item.key }}
-            <el-popover
-              placement="top-start"
-              trigger="hover"
-              content="点击复制TAG"
-              style="min-width: 10px"
-              v-if="showCopyBtn(item.key)"
-            >
+            <el-popover placement="top-start" trigger="hover" content="点击复制TAG" style="min-width: 10px"
+              v-if="showCopyBtn(item.key)">
               <template #reference>
-                <el-button
-                  style="margin-left: 6px"
-                  :icon="CopyDocument"
-                  :link="true"
-                  @click="
-                    item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
-                  "
-                />
+                <el-button style="margin-left: 6px" :icon="CopyDocument" :link="true" @click="
+                  item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
+                " />
               </template>
             </el-popover>
           </h1>
-          <p
-            class="text-wrap break-all text-sm mt-1 text-gray-600"
-            style="white-space: pre-wrap"
-            v-if="item.key != 'Comment'"
-          >
+          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap"
+            v-if="item.key != 'Comment'">
             {{ item.value }}
           </p>
-          <json-viewer
-            :value="jsonData"
-            v-if="item.key == 'Comment'"
-          ></json-viewer>
+          <json-viewer :value="jsonData" v-if="item.key == 'Comment'"></json-viewer>
         </div>
       </div>
 
       <div v-if="exifRef" class="mt-4 text-left max-w-740px mx-auto">
         <h1 class="font-bold text-2xl mb-4">EXIF</h1>
-        <div
-          :class="[index === 0 && 'border-t border-t-gray-300']"
+        <div :class="[index === 0 && 'border-t border-t-gray-300']"
           class="bg-white border-b border-l border-r px-4 border-b-gray-300 border-l-gray-300 border-r-gray-300 py-2"
-          v-for="(item, index) in exifRef"
-          :key="item.key"
-        >
+          v-for="(item, index) in exifRef" :key="item.key">
           <h1 class="font-semibold text-sm text-gray-800">{{ item.key }}</h1>
-          <p
-            class="text-wrap break-all text-sm mt-1 text-gray-600"
-            style="white-space: pre-wrap"
-          >
+          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap">
             {{ item.value.description }}
           </p>
         </div>
       </div>
     </div>
+
+    <div v-if="modelFileRef" class="my-6">
+      <div v-if="modelFileInfoRef" class="mt-4 text-left max-w-740px mx-auto">
+        <h1 class="font-bold text-2xl mb-4">模型信息</h1>
+        <div :class="[index === 0 && 'border-t border-t-gray-300']"
+          class="bg-white border-b border-l border-r px-4 border-b-gray-300 border-l-gray-300 border-r-gray-300 py-2"
+          v-for="(item, index) in modelFileInfoRef" :key="item.k">
+          <h1 class="font-semibold text-sm text-gray-800">
+            {{ item.k }}
+          </h1>
+          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap"
+            v-if="item.k != 'Info'">
+            {{ item.v }}
+          </p>
+          <json-viewer :value="jsonData" v-if="item.k == 'Info'"></json-viewer>
+        </div>
+      </div>
+    </div>
+
     <p class="text-gray-500 my-2 text-sm">
-      *运算完全在你的电脑上运行不会上传图片到云端
+      *运算完全在你的电脑上运行不会上传到云端
     </p>
     <div class="my-4 pt-4">
       如果您觉得本项目对您有帮助 请在 →
-      <a
-        class="inline-block text-sm text-gray-500"
-        href="https://github.com/Akegarasu/novelai-tagreader"
-        >GitHub</a
-      >
+      <a class="inline-block text-sm text-gray-500" href="https://github.com/Akegarasu/novelai-tagreader">GitHub</a>
       ←上点个star
       <br />
       <span class="inline-block mt-2 text-sm text-gray-500">
         Made with ❤️ by
-        <a class="text-gray-500" href="https://github.com/Akegarasu"
-          >@Akegarasu</a
-        >
+        <a class="text-gray-500" href="https://github.com/Akegarasu">@Akegarasu</a>
         <a> | </a>
-        <a class="text-gray-500" href="https://space.bilibili.com/12566101"
-          >bilibili@秋葉aaaki</a
-        >
+        <a class="text-gray-500" href="https://space.bilibili.com/12566101">秋葉aaaki</a>
+        <a> | </a>
+        <a class="text-gray-500" href="https://novelai.dev">NovelAI.Dev</a>
       </span>
     </div>
   </div>
@@ -130,20 +104,41 @@ import jsonViewer from "vue-json-viewer";
 import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
 
-const fileRef = ref(null);
+const imgFileRef = ref(null);
 const imageRef = ref(null);
 const exifRef = ref(null);
-const fileInfoRef = ref(null);
+const imgfileInfoRef = ref(null);
+
+const modelFileRef = ref(null);
+const modelFileInfoRef = ref(null);
+
 const jsonData = ref(null);
 const imageMaxSizeRef = ref(0);
 const { toClipboard } = useClipboard();
 
-watch(fileRef, () => {
-  if (!fileRef.value) return;
-  readImageBase64();
-  readExif();
-  readFileInfo();
-});
+const availableImgExt = ["png", "jpeg", "jpg", "webp"]
+const availableModelExt = ["pt", "ckpt", "safetensors"]
+
+const modelSig = {
+  string_to_param: "Embedding",
+  "model.diffusion_model.": "Stable Diffusion",
+  "cond_stage_model.transformer.": "Stable Diffusion",
+  lora_te_text_model_encoder: "LoRA",
+  "encoder.down.0.block": "VAE",
+  "linear.0.weight": "Hypernetworks",
+  "linear1.weight": "Hypernetworks",
+};
+
+const modelUseGuide = {
+  "Stable Diffusion":
+    "大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
+  VAE: "放入 models/VAE 文件夹后，在 webui 中的设置页面 - Stable Diffusion - 模型的 VAE 选择并保存",
+  LoRA: "放入 models/Lora 文件夹后，在 webui 中，“生成” 按钮的下方选择 🎴 按钮，找到 Lora 选项卡点击使用。",
+  Hypernetworks:
+    "放入 models/hypernetworks 文件夹后，在 webui 中，“生成” 按钮的下方选择 🎴 按钮，找到 hypernetworks 选项卡点击使用。",
+  Embedding:
+    "放入 embeddings 文件夹后，在 webui 中，“生成” 按钮的下方选择 🎴 按钮，找到 embeddings 选项卡点击使用。",
+};
 
 const copy = (value) => {
   try {
@@ -174,11 +169,79 @@ const showCopyBtn = (title) => {
 
 async function handleUpload(file) {
   console.log(file);
-  fileRef.value = file;
+  let fileExt = file.name.split(".").pop();
+  if (availableModelExt.indexOf(fileExt) != -1) {
+    modelFileRef.value = file
+    imgFileRef.value = null
+    guessModel(file)
+  } else {
+    imgFileRef.value = file;
+    modelFileInfoRef.value = null
+    readImageBase64()
+    exifRef.value = await readExif()
+    imgfileInfoRef.value = await readFileInfo(file)
+  }
   return false;
 }
 
-async function readNovelAITag(file) {
+const guessModel = (file) => {
+  const rd = new FileReader();
+  rd.readAsBinaryString(file.slice(0, 1024 * 5));
+  rd.onload = function (readRes) {
+    const content = readRes.target.result
+    let modelType = "";
+    let fileSize = file.size;
+    let fileExt = file.name.split(".").pop();
+    if (fileSize < 1024 * 10) {
+      fileInfoRef.value = [{ k: "错误", v: "文件可能不是模型" }];
+      return;
+    }
+
+    if (fileSize < 1024 * 1024 && content.indexOf("string_to_param") != -1) {
+      modelType = "Embedding";
+    } else {
+      for (let sig in modelSig) {
+        if (content.indexOf(sig) != -1) {
+          modelType = modelSig[sig];
+          break;
+        }
+      }
+    }
+
+    let modelTypeOk =
+      modelType == "" ? "未知模型种类或非模型" : modelType + " 模型";
+    let ok = [
+      { k: "文件名", v: file.name },
+      { k: "文件大小", v: printableBytes(fileSize) },
+      { k: "模型种类", v: modelTypeOk },
+    ];
+
+    if (modelType != "") {
+      ok.push({ k: "模型用法", v: modelUseGuide[modelType] });
+    }
+
+    if (fileExt == "safetensors" && modelType == "LoRA") {
+      let ret = tryExtractLoraMeta(content);
+      if (ret) {
+        ok.push({ k: "Info", v: jsonData });
+      }
+    }
+    modelFileInfoRef.value = ok;
+  }
+}
+
+const tryExtractLoraMeta = (content) => {
+  const reg = new RegExp(/{"__metadata__":(.*ss_vae_name":.+?)}/);
+  let match = reg.exec(content);
+  if (match) {
+    jsonData.value = JSON.parse(match[1] + "}");
+    return true;
+  }
+  return false;
+};
+
+
+const readNovelAITag = async (file) => {
   const buf = await file.arrayBuffer();
   let chunks = [];
   try {
@@ -205,13 +268,12 @@ async function readNovelAITag(file) {
   return textChunks;
 }
 
-async function readFileInfo() {
-  const file = fileRef.value;
-  let nai = await readNovelAITag(file);
+async function readFileInfo(file) {
+  let nai = await readNovelAITag(file)
   if (nai.length == 1) {
-    nai = await handleWebUiTag(nai[0]);
+    nai = await handleWebUiTag(nai[0])
   }
-  fileInfoRef.value = [
+  let ok = [
     { key: "文件名", value: file.name },
     { key: "文件大小", value: prettyBytes(file.size) },
     ...nai.map((v, k) => {
@@ -223,16 +285,17 @@ async function readFileInfo() {
         value: v.text,
       };
     }),
-  ];
+  ]
   if (nai.length == 0) {
-    fileInfoRef.value.push({
+    ok.push({
       key: "提示",
-      value: "这可能不是一张NovelAI生成的图或者不是原图, 经过了压缩",
-    });
+      value: "这可能不是一张 Stable Diffusion 生成的图或者不是原图, 经过了压缩",
+    })
   }
+  return ok
 }
 
-async function handleWebUiTag(data) {
+const handleWebUiTag = (data) => {
   let [prompts, otherParas] = data.text.split("Steps: ");
   let promptSplit = prompts.split("Negative prompt: ");
   let negativePrompt = promptSplit.length > 1 ? promptSplit[1] : "无";
@@ -252,9 +315,10 @@ async function handleWebUiTag(data) {
   ];
 }
 
-function readImageBase64() {
+const readImageBase64 = () => {
   imageRef.value = null;
   const reader = new FileReader();
+  reader.readAsDataURL(imgFileRef.value);
   reader.onload = () => {
     const image = new Image();
     image.onload = () => {
@@ -269,13 +333,31 @@ function readImageBase64() {
     };
     image.src = reader.result;
   };
-  reader.readAsDataURL(fileRef.value);
 }
 
-async function readExif() {
-  const file = fileRef.value;
+const readExif = async () => {
+  const file = imgFileRef.value;
   const data = await ExifReader.load(file);
   const entries = Object.entries(data);
-  exifRef.value = entries.map(([key, value]) => ({ key, value }));
+  return entries.map(([key, value]) => ({ key, value }));
 }
+
+const printableBytes = (size) => {
+  const printable = (d, z) => {
+    return `${d.toFixed(2)} ${z}`;
+  };
+
+  let kb = size / 1024;
+  if (kb < 1024) {
+    return printable(kb, "KB");
+  }
+  let mb = kb / 1024;
+  if (mb < 1024) {
+    return printable(mb, "MB");
+  }
+
+  let gb = mb / 1024;
+  return printable(gb, "GB");
+};
+
 </script>
