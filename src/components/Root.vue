@@ -121,7 +121,7 @@ const imageMaxSizeRef = ref(0);
 const { toClipboard } = useClipboard();
 
 const availableImgExt = ["png", "jpeg", "jpg", "webp", "bmp"]
-const availableModelExt = ["pt", "ckpt", "safetensors"]
+const availableModelExt = ["pt", "pth", "ckpt", "safetensors", "bin"]
 
 const modelSig = {
   string_to_param: "Embedding",
