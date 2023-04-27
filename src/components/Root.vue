@@ -199,7 +199,7 @@ const inspectImage = async (file) => {
 
 const inspectModel = async (file) => {
   const rd = new FileReader();
-  rd.readAsBinaryString(file.slice(0, 1024 * 5));
+  rd.readAsBinaryString(file.slice(0, 1024 * 50));
   rd.onload = function (readRes) {
     const content = readRes.target.result
     let modelType = "";
@@ -244,7 +244,7 @@ const inspectModel = async (file) => {
 }
 
 const tryExtractLoraMeta = (content) => {
-  const reg = new RegExp(/{"__metadata__":(.*ss_vae_name":.+?)}/);
+  const reg = new RegExp(/{"__metadata__":(.*sshs_model_hash":.+?)}/);
   let match = reg.exec(content);
   if (match) {
     jsonData.value = JSON.parse(match[1] + "}");
