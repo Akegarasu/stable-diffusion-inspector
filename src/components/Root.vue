@@ -28,9 +28,8 @@
             <el-popover placement="top-start" trigger="hover" content="点击复制TAG" style="min-width: 10px"
               v-if="showCopyBtn(item.key)">
               <template #reference>
-                <el-button style="margin-left: 6px" :icon="CopyDocument" :link="true" @click="
-                  item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
-                " />
+                <el-button style="margin-left: 6px" :icon="CopyDocument" :link="true" @click="item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
+                  " />
               </template>
             </el-popover>
           </h1>
@@ -64,8 +63,7 @@
           <h1 class="font-semibold text-sm text-gray-800">
             {{ item.k }}
           </h1>
-          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap"
-            v-if="item.k != 'Info'">
+          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap" v-if="item.k != 'Info'">
             {{ item.v }}
           </p>
           <json-viewer :value="jsonData" v-if="item.k == 'Info'"></json-viewer>
@@ -244,10 +242,17 @@ const inspectModel = async (file) => {
 }
 
 const tryExtractLoraMeta = (content) => {
+  const jsonKeys = ["ss_bucket_info", "ss_network_args", "ss_dataset_dirs", "ss_tag_frequency"]
   const reg = new RegExp(/{"__metadata__":(.*sshs_model_hash":.+?)}/);
   let match = reg.exec(content);
   if (match) {
-    jsonData.value = JSON.parse(match[1] + "}");
+    let data = JSON.parse(match[1] + "}");
+    for (let k of jsonKeys) {
+      if (data[k]) {
+        data[k] = JSON.parse(data[k])
+      }
+    }
+    jsonData.value = data;
     return true;
   }
   return false;
