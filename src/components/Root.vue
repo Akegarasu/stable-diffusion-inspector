@@ -95,6 +95,16 @@
   </div>
 </template>
 
+<style>
+.jv-container {
+  line-height: 1.2;
+}
+
+.jv-code {
+  padding: 10px 20px !important;
+}
+</style>
+
 <script setup>
 import { ElMessage } from "element-plus";
 import ExifReader from "exifreader";
