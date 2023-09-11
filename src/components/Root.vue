@@ -25,7 +25,7 @@
           v-for="(item, index) in imgfileInfoRef" :key="item.key">
           <h1 class="font-semibold text-sm text-gray-800">
             {{ item.key }}
-            <el-popover placement="top-start" trigger="hover" content="点击复制TAG" style="min-width: 10px"
+            <el-popover placement="top-start" trigger="hover" content="点击复制" style="min-width: 10px"
               v-if="showCopyBtn(item.key)">
               <template #reference>
                 <el-button style="margin-left: 6px" :icon="CopyDocument" :link="true" @click="item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
@@ -172,6 +172,7 @@ const showCopyBtn = (title) => {
   if (
     title == "Description" ||
     title == "Comment" ||
+    title == "完整生成信息" ||
     title.indexOf("提示词") != -1
   ) {
     return true;
@@ -312,6 +313,7 @@ const readNovelAITag = async (file) => {
 async function readFileInfo(file) {
   jsonData.value = null
   let nai = await readNovelAITag(file)
+  let fullParams = nai[0]["text"]
   if (nai.length == 1) {
     nai = await handleWebUiTag(nai[0])
   }
@@ -327,6 +329,7 @@ async function readFileInfo(file) {
         value: v.text,
       };
     }),
+    { key: "完整生成信息", value: fullParams },
   ]
   if (nai.length == 0) {
     ok.push({
