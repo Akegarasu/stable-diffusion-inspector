@@ -136,6 +136,7 @@ const modelSig = {
   "model.diffusion_model.": "Stable Diffusion",
   "cond_stage_model.transformer.": "Stable Diffusion",
   lora_te_text_model_encoder: "LoRA",
+  lora_unet: "LoRA",
   "encoder.down.0.block": "VAE",
   "linear.0.weight": "Hypernetworks",
   "linear1.weight": "Hypernetworks",
@@ -300,8 +301,8 @@ const readNovelAITag = async (file) => {
         let data = chunk.data.filter((x) => x != 0x0);
         let txt = new TextDecoder().decode(data);
         return {
-          keyword: "信息",
-          text: txt.slice(10),
+          keyword: "Description",
+          text: txt.slice(11),
         };
       }
       return text.decode(chunk.data);
