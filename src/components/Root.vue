@@ -29,7 +29,7 @@
               v-if="showCopyBtn(item.key)">
               <template #reference>
                 <el-button style="margin-left: 6px" :icon="CopyDocument" :link="true" @click="item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
-                  " />
+      " />
               </template>
             </el-popover>
           </h1>
@@ -63,7 +63,8 @@
           <h1 class="font-semibold text-sm text-gray-800">
             {{ item.k }}
           </h1>
-          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap" v-if="item.k != 'Info'">
+          <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap"
+            v-if="item.k != 'Info'">
             {{ item.v }}
           </p>
           <json-viewer :value="jsonData" v-if="item.k == 'Info'"></json-viewer>
@@ -75,7 +76,7 @@
     </div>
 
     <p class="text-gray-500 my-2 text-sm">
-      *运算完全在你的电脑上运行不会上传到云端
+      *运算完全在你的设备上运行不会上传到云端
     </p>
     <div class="my-4 pt-4">
       如果您觉得本项目对您有帮助 请在 →
@@ -105,7 +106,7 @@
 }
 </style>
 
-<script setup>
+<script setup lang="ts">
 import { ElMessage } from "element-plus";
 import ExifReader from "exifreader";
 import { ref, watch } from "vue";
@@ -115,6 +116,8 @@ import text from "png-chunk-text";
 import jsonViewer from "vue-json-viewer";
 import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
+
+import { asyncFileReaderAsDataURL, getStealthExif, tryExtractLoraMeta } from "../utils";
 
 const imgFileRef = ref(null);
 const imageRef = ref(null);
@@ -202,7 +205,7 @@ async function handleUpload(file) {
 }
 
 const inspectImage = async (file) => {
-  readImageBase64()
+  await readImageBase64()
   exifRef.value = await readExif(file)
   imgfileInfoRef.value = await readFileInfo(file)
 }
@@ -253,38 +256,8 @@ const inspectModel = async (file) => {
   }
 }
 
-const tryExtractLoraMeta = (content) => {
-  const jsonKeys = ["ss_bucket_info", "ss_network_args", "ss_dataset_dirs", "ss_tag_frequency"]
-  let metadataStr = '{';
-  let i = content.indexOf('__metadata__');
-  if (i == -1) {
-    console.log("no metadata found")
-    return false;
-  }
-  i += 15; // skip `__metadata__':{`
-  let braceCount = 1;
-  while (braceCount > 0 && i < content.length) {
-    metadataStr += content[i];
-    if (content[i] === '{') {
-      braceCount++;
-    } else if (content[i] === '}') {
-      braceCount--;
-    }
-    i++;
-  }
-  console.log(metadataStr)
-  const data = JSON.parse(metadataStr);
-  for (let k of jsonKeys) {
-    if (data[k]) {
-      data[k] = JSON.parse(data[k])
-    }
-  }
-  jsonData.value = data;
-  return true;
-};
 
-
-const readNovelAITag = async (file) => {
+const extractMetadata = async (file) => {
   const buf = await file.arrayBuffer();
   let chunks = [];
   try {
@@ -300,12 +273,10 @@ const readNovelAITag = async (file) => {
       if (chunk.name === "iTXt") {
         let data = chunk.data.filter((x) => x != 0x0);
         let txt = new TextDecoder().decode(data);
-        return {
-          keyword: "Description",
-          text: txt.slice(11),
-        };
+        return txt
+      } else {
+        return text.decode(chunk.data);
       }
-      return text.decode(chunk.data);
     });
   console.log(textChunks);
   return textChunks;
@@ -313,15 +284,35 @@ const readNovelAITag = async (file) => {
 
 async function readFileInfo(file) {
   jsonData.value = null
-  let nai = await readNovelAITag(file)
-  let fullParams = nai[0]["text"]
-  if (nai.length == 1) {
-    nai = await handleWebUiTag(nai[0])
+
+  let metaType = "SD-WEBUI"
+  let parsed = []
+  let metadata = await extractMetadata(file)
+
+  if (metadata.length == 0) {
+    let exif = await getStealthExif(imageRef.value.src)
+    if (exif) {
+      parsed = Object.keys(exif).map((key) => {
+        return {
+          keyword: key,
+          text: exif[key],
+        }
+      });
+      metaType = "NOVELAI"
+    } else {
+      return []
+    }
+  } else if (metadata.length == 1) {
+    parsed = await handleWebUiTag(metadata[0])
+  } else {
+    parsed = metadata
+    metaType = "NOVELAI"
   }
+
   let ok = [
     { key: "文件名", value: file.name },
     { key: "文件大小", value: prettyBytes(file.size) },
-    ...nai.map((v, k) => {
+    ...parsed.map((v, k) => {
       if (v.keyword == "Comment") {
         jsonData.value = JSON.parse(v.text);
       }
@@ -330,12 +321,16 @@ async function readFileInfo(file) {
         value: v.text,
       };
     }),
-    { key: "完整生成信息", value: fullParams },
   ]
-  if (nai.length == 0) {
+
+  if (metaType == "SD-WEBUI") {
+    ok.push({ key: "完整生成信息", value: metadata[0]["text"] })
+  }
+
+  if (parsed.length == 0) {
     ok.push({
       key: "提示",
-      value: "这可能不是一张 Stable Diffusion 生成的图或者不是原图, 经过了压缩",
+      value: "无法读取到图像 Metadata，这可能不是一张 Stable Diffusion 生成的图。或者不是原图, 经过了压缩。",
     })
   }
   return ok
@@ -361,24 +356,19 @@ const handleWebUiTag = (data) => {
   ];
 }
 
-const readImageBase64 = () => {
+const readImageBase64 = async () => {
   imageRef.value = null;
-  const reader = new FileReader();
-  reader.readAsDataURL(imgFileRef.value);
-  reader.onload = () => {
-    const image = new Image();
-    image.onload = () => {
-      const { width, height } = image;
-      imageRef.value = {
-        width,
-        height,
-        src: reader.result,
-      };
-
-      imageMaxSizeRef.value = width;
-    };
-    image.src = reader.result;
+  let result = await asyncFileReaderAsDataURL(imgFileRef.value)
+  const image = new Image();
+  image.src = result;
+  await image.decode();
+  const { width, height } = image;
+  imageRef.value = {
+    width,
+    height,
+    src: result,
   };
+  imageMaxSizeRef.value = width;
 }
 
 const readExif = async (file) => {

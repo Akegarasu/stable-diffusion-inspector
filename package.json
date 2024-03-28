@@ -15,6 +15,7 @@
     "file-saver": "^2.0.5",
     "file-type": "^17.1.4",
     "mime-types": "^2.1.35",
+    "pako": "^2.1.0",
     "png-chunk-text": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
     "pretty-bytes": "^6.0.0",
