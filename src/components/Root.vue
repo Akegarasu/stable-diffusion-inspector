@@ -117,7 +117,7 @@ import jsonViewer from "vue-json-viewer";
 import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
 
-import { asyncFileReaderAsDataURL, getStealthExif, tryExtractLoraMeta } from "../utils";
+import { asyncFileReaderAsDataURL, getStealthExif, tryExtractSafetensorsMeta } from "../utils";
 
 const imgFileRef = ref(null);
 const imageRef = ref(null);
@@ -136,6 +136,7 @@ const availableModelExt = ["pt", "pth", "ckpt", "safetensors", "bin"]
 
 const modelSig = {
   string_to_param: "Embedding",
+  "conditioner.embedders.1.model.transformer.resblocks": "SDXL",
   "model.diffusion_model.": "Stable Diffusion",
   "cond_stage_model.transformer.": "Stable Diffusion",
   lora_te_text_model_encoder: "LoRA",
@@ -146,14 +147,14 @@ const modelSig = {
 };
 
 const modelUseGuide = {
-  "Stable Diffusion":
-    "大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
+  "Stable Diffusion": "Stable Diffusion 1.5/2.0 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
+  "SDXL": "Stable Diffusion XL 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
   VAE: "放入 models/VAE 文件夹后，在 webui 中的设置页面 - Stable Diffusion - 模型的 VAE 选择并保存",
-  LoRA: "放入 models/Lora 文件夹后，在 webui 中，“生成” 按钮的下方选择 🎴 按钮，找到 Lora 选项卡点击使用。",
+  LoRA: "放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。",
   Hypernetworks:
-    "放入 models/hypernetworks 文件夹后，在 webui 中，“生成” 按钮的下方选择 🎴 按钮，找到 hypernetworks 选项卡点击使用。",
+    "放入 models/hypernetworks 文件夹后，在 webui 中，提示词输入框下方，找到 hypernetworks 选项卡点击使用。",
   Embedding:
-    "放入 embeddings 文件夹后，在 webui 中，“生成” 按钮的下方选择 🎴 按钮，找到 embeddings 选项卡点击使用。",
+    "放入 embeddings 文件夹后，在 webui 中，提示词输入框下方，找到 embeddings 选项卡点击使用。",
 };
 
 const copy = (value) => {
@@ -215,6 +216,7 @@ const inspectModel = async (file) => {
   rd.readAsBinaryString(file.slice(0, 1024 * 50));
   rd.onload = function (readRes) {
     const content = readRes.target.result
+    console.log("[debug] file content: "+content)
     let modelType = "";
     let fileSize = file.size;
     let fileExt = file.name.split(".").pop();
@@ -246,9 +248,10 @@ const inspectModel = async (file) => {
       ok.push({ k: "模型用法", v: modelUseGuide[modelType] });
     }
 
-    if (fileExt == "safetensors" && modelType == "LoRA") {
-      let ret = tryExtractLoraMeta(content);
+    if (fileExt == "safetensors") {
+      let ret = tryExtractSafetensorsMeta(content);
       if (ret) {
+        jsonData.value = ret;
         ok.push({ k: "Info", v: jsonData });
       }
     }

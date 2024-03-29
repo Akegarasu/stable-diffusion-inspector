@@ -53,13 +53,13 @@ export const asyncFileReaderAsDataURL = (file) => {
     });
 };
 
-export const tryExtractLoraMeta = (content) => {
+export const tryExtractSafetensorsMeta = (content) => {
     const jsonKeys = ["ss_bucket_info", "ss_network_args", "ss_dataset_dirs", "ss_tag_frequency"]
     let metadataStr = '{';
     let i = content.indexOf('__metadata__');
     if (i == -1) {
         console.log("no metadata found")
-        return false;
+        return null;
     }
     i += 15; // skip `__metadata__':{`
     let braceCount = 1;
@@ -72,15 +72,14 @@ export const tryExtractLoraMeta = (content) => {
         }
         i++;
     }
-    console.log(metadataStr)
+    console.log("[debug] metadata: "+metadataStr)
     const data = JSON.parse(metadataStr);
     for (let k of jsonKeys) {
         if (data[k]) {
             data[k] = JSON.parse(data[k])
         }
     }
-    jsonData.value = data;
-    return true;
+    return data;
 };
 
 export async function getStealthExif(src) {
