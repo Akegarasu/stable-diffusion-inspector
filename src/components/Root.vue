@@ -6,7 +6,7 @@
     </p>
     <div v-if="imgFileRef" class="my-6">
       <div class="bg-white max-w-720px mx-auto border border-gray-300 p-2" v-if="imageRef">
-        <img v-if="imageRef" v-bind="imageRef" alt="" style="display: block; width: 100%; height: auto" />
+        <img v-if="imageRef" v-bind="imageRef" alt="" style="display: block; width: auto; height: 30vh; margin:auto" />
       </div>
     </div>
 
@@ -216,7 +216,7 @@ const inspectModel = async (file) => {
   rd.readAsBinaryString(file.slice(0, 1024 * 50));
   rd.onload = function (readRes) {
     const content = readRes.target.result
-    console.log("[debug] file content: "+content)
+    console.log("[debug] file content: " + content)
     let modelType = "";
     let fileSize = file.size;
     let fileExt = file.name.split(".").pop();
