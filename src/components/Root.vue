@@ -34,10 +34,11 @@
             </el-popover>
           </h1>
           <p class="text-wrap break-all text-sm mt-1 text-gray-600" style="white-space: pre-wrap"
-            v-if="item.key != 'Comment'">
+            v-if="!showJsonViewer(item.key)">
             {{ item.value }}
           </p>
-          <json-viewer :value="jsonData" v-if="item.key == 'Comment'"></json-viewer>
+          <json-viewer :value="jsonData" v-if="jsonData != null && showJsonViewer(item.key)" :expand-depth=4>
+          </json-viewer>
         </div>
       </div>
 
@@ -67,7 +68,7 @@
             v-if="item.k != 'Info'">
             {{ item.v }}
           </p>
-          <json-viewer :value="jsonData" v-if="item.k == 'Info'"></json-viewer>
+          <json-viewer :value="jsonData" v-if="item.k == 'Info'" :expand-depth=4></json-viewer>
         </div>
       </div>
       <div class="my-4 pt-4">
@@ -185,11 +186,30 @@ const showCopyBtn = (title) => {
   return false;
 };
 
-async function handleUpload(file) {
-  console.log(file);
-  let fileExt = file.name.split(".").pop().toLowerCase();
+const showJsonViewer = (title) => {
+  if (
+    title == "Comment" ||
+    title == "workflow"
+  ) {
+    return true;
+  }
+  return false;
+};
+
+const cleanData = () => {
   imgFileRef.value = null
   modelFileRef.value = null
+  imgfileInfoRef.value = null
+  modelFileInfoRef.value = null
+  exifRef.value = null
+  jsonData.value = null
+}
+
+async function handleUpload(file) {
+  console.log(file);
+  cleanData()
+
+  let fileExt = file.name.split(".").pop().toLowerCase();
   if (availableModelExt.indexOf(fileExt) != -1) {
     modelFileRef.value = file
     inspectModel(file)
@@ -303,7 +323,10 @@ async function readFileInfo(file) {
       });
       metaType = "NOVELAI"
     } else {
-      return []
+      return [{
+        key: "提示",
+        value: "无法读取到图像 Metadata，这可能不是一张 Stable Diffusion 生成的图。或者不是原图, 经过了压缩。",
+      }]
     }
   } else if (metadata.length == 1) {
     parsed = await handleWebUiTag(metadata[0])
@@ -316,7 +339,7 @@ async function readFileInfo(file) {
     { key: "文件名", value: file.name },
     { key: "文件大小", value: prettyBytes(file.size) },
     ...parsed.map((v, k) => {
-      if (v.keyword == "Comment") {
+      if (showJsonViewer(v.keyword)) {
         jsonData.value = JSON.parse(v.text);
       }
       return {
