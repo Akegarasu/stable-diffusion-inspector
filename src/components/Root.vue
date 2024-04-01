@@ -119,6 +119,7 @@ import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
 
 import { asyncFileReaderAsDataURL, getStealthExif, tryExtractSafetensorsMeta } from "../utils";
+import { he } from "element-plus/es/locale";
 
 const imgFileRef = ref(null);
 const imageRef = ref(null);
@@ -175,6 +176,7 @@ const copy = (value) => {
 };
 
 const showCopyBtn = (title) => {
+  if (!title) return false
   if (
     title == "Description" ||
     title == "Comment" ||
@@ -295,8 +297,21 @@ const extractMetadata = async (file) => {
     .map(function (chunk) {
       if (chunk.name === "iTXt") {
         let data = chunk.data.filter((x) => x != 0x0);
-        let txt = new TextDecoder().decode(data);
-        return txt
+        let header = new TextDecoder().decode(data.slice(0, 11));
+        if (header == "Description") {
+          data = data.slice(11);
+          let txt = new TextDecoder().decode(data);
+          return {
+            keyword: "Description",
+            text: txt,
+          };
+        } else {
+          let txt = new TextDecoder().decode(data);
+          return {
+            keyword: "Unknown",
+            text: txt,
+          };
+        }
       } else {
         return text.decode(chunk.data);
       }
