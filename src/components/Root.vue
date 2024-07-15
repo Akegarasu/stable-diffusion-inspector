@@ -29,7 +29,7 @@
               v-if="showCopyBtn(item.key)">
               <template #reference>
                 <el-button style="margin-left: 6px" :icon="CopyDocument" :link="true" @click="item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
-      " />
+                  " />
               </template>
             </el-popover>
           </h1>
@@ -413,9 +413,14 @@ const readImageBase64 = async () => {
 }
 
 const readExif = async (file) => {
-  const data = await ExifReader.load(file);
-  const entries = Object.entries(data);
-  return entries.map(([key, value]) => ({ key, value }));
+  try {
+    const data = await ExifReader.load(file);
+    const entries = Object.entries(data);
+    return entries.map(([key, value]) => ({ key, value }));
+  }
+  catch (MetadataMissingError) {
+    return [];
+  }
 }
 
 const printableBytes = (size) => {
