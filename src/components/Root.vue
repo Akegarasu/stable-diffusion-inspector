@@ -409,9 +409,14 @@ const readImageBase64 = async () => {
 }
 
 const readExif = async (file) => {
-  const data = await ExifReader.load(file);
-  const entries = Object.entries(data);
-  return entries.map(([key, value]) => ({ key, value }));
+  try {
+    const data = await ExifReader.load(file);
+    const entries = Object.entries(data);
+    return entries.map(([key, value]) => ({ key, value }));
+  }
+  catch (MetadataMissingError) {
+    return [];
+  }
 }
 
 const printableBytes = (size) => {
