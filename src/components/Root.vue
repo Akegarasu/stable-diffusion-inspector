@@ -29,7 +29,7 @@
               v-if="showCopyBtn(item.key)">
               <template #reference>
                 <el-button style="margin-left: 6px" :icon="CopyDocument" :link="true" @click="item.key == 'Comment' ? copy(jsonData.uc) : copy(item.value)
-      " />
+                  " />
               </template>
             </el-popover>
           </h1>
@@ -118,7 +118,7 @@ import jsonViewer from "vue-json-viewer";
 import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
 
-import { asyncFileReaderAsDataURL, getStealthExif, tryExtractSafetensorsMeta } from "../utils";
+import { asyncFileReaderAsDataURL, getStealthExif, tryExtractSafetensorsMeta, tryExtractSafetensorsMetaFull } from "../utils";
 import { he } from "element-plus/es/locale";
 
 const imgFileRef = ref(null);
@@ -234,51 +234,47 @@ const inspectImage = async (file) => {
 }
 
 const inspectModel = async (file) => {
-  const rd = new FileReader();
-  rd.readAsBinaryString(file.slice(0, 1024 * 50));
-  rd.onload = function (readRes) {
-    const content = readRes.target.result
-    console.log("[debug] file content: " + content)
-    let modelType = "";
-    let fileSize = file.size;
-    let fileExt = file.name.split(".").pop();
-    if (fileSize < 1024 * 10) {
-      fileInfoRef.value = [{ k: "错误", v: "文件可能不是模型" }];
-      return;
-    }
-
-    if (fileSize < 1024 * 1024 && content.indexOf("string_to_param") != -1) {
-      modelType = "Embedding";
-    } else {
-      for (let sig in modelSig) {
-        if (content.indexOf(sig) != -1) {
-          modelType = modelSig[sig];
-          break;
-        }
-      }
-    }
-
-    let modelTypeOk =
-      modelType == "" ? "未知模型种类或非模型" : modelType + " 模型";
-    let ok = [
-      { k: "文件名", v: file.name },
-      { k: "文件大小", v: printableBytes(fileSize) },
-      { k: "模型种类", v: modelTypeOk },
-    ];
-
-    if (modelType != "") {
-      ok.push({ k: "模型用法", v: modelUseGuide[modelType] });
-    }
-
-    if (fileExt == "safetensors") {
-      let ret = tryExtractSafetensorsMeta(content);
-      if (ret) {
-        jsonData.value = ret;
-        ok.push({ k: "Info", v: jsonData });
-      }
-    }
-    modelFileInfoRef.value = ok;
+  const content = await file.slice(0, 1024 * 50).text()
+  console.log("[debug] file content: " + content)
+  let modelType = "";
+  let fileSize = file.size;
+  let fileExt = file.name.split(".").pop();
+  if (fileSize < 1024 * 10) {
+    fileInfoRef.value = [{ k: "错误", v: "文件可能不是模型" }];
+    return;
   }
+
+  if (fileSize < 1024 * 1024 && content.indexOf("string_to_param") != -1) {
+    modelType = "Embedding";
+  } else {
+    for (let sig in modelSig) {
+      if (content.indexOf(sig) != -1) {
+        modelType = modelSig[sig];
+        break;
+      }
+    }
+  }
+
+  let modelTypeOk =
+    modelType == "" ? "未知模型种类或非模型" : modelType + " 模型";
+  let ok = [
+    { k: "文件名", v: file.name },
+    { k: "文件大小", v: printableBytes(fileSize) },
+    { k: "模型种类", v: modelTypeOk },
+  ];
+
+  if (modelType != "") {
+    ok.push({ k: "模型用法", v: modelUseGuide[modelType] });
+  }
+
+  if (fileExt == "safetensors") {
+    let ret = await tryExtractSafetensorsMetaFull(file);
+    if (ret) {
+      jsonData.value = ret;
+      ok.push({ k: "Info", v: jsonData });
+    }
+  }
+  modelFileInfoRef.value = ok;
 }
 
 

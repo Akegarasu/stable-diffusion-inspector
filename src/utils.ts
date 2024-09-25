@@ -1,6 +1,10 @@
 import pako from 'pako';
 
 class DataReader {
+
+    data: number[]
+    index: number
+
     constructor(data) {
         this.data = data;
         this.index = 0;
@@ -11,7 +15,7 @@ class DataReader {
     }
 
     readNBits(n) {
-        let bits = [];
+        let bits: number[] = [];
         for (let i = 0; i < n; i++) {
             bits.push(this.readBit());
         }
@@ -27,7 +31,7 @@ class DataReader {
     }
 
     readNBytes(n) {
-        let bytes = [];
+        let bytes: number[] = [];
         for (let i = 0; i < n; i++) {
             bytes.push(this.readByte());
         }
@@ -44,7 +48,7 @@ export const asyncFileReaderAsDataURL = (file) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            resolve(e.target.result);
+            resolve(e.target?.result);
         };
         reader.onerror = (e) => {
             reject(e);
@@ -72,7 +76,7 @@ export const tryExtractSafetensorsMeta = (content) => {
         }
         i++;
     }
-    console.log("[debug] metadata: "+metadataStr)
+    console.log("[debug] metadata: " + metadataStr)
     const data = JSON.parse(metadataStr);
     for (let k of jsonKeys) {
         if (data[k]) {
@@ -82,11 +86,32 @@ export const tryExtractSafetensorsMeta = (content) => {
     return data;
 };
 
+export const tryExtractSafetensorsMetaFull = async (file: File) => {
+    let buf = await file.slice(0, 8).arrayBuffer()
+    let dv = new DataView(buf, 0);
+    let metaLen = dv.getInt32(0, true)
+    let metaBuf = await file.slice(8, metaLen + 8).text()
+    let meta = JSON.parse(metaBuf)
+    if (!meta["__metadata__"]) {
+        console.log("no metadata found")
+        return null;
+    }
+    let data = meta["__metadata__"]
+    const jsonKeys = ["ss_bucket_info", "ss_network_args", "ss_dataset_dirs", "ss_tag_frequency"]
+    for (let k of jsonKeys) {
+        if (data[k]) {
+            data[k] = JSON.parse(data[k])
+        }
+    }
+    return data;
+};
+
+
 export async function getStealthExif(src) {
     let time = performance.now();
 
     let canvas = document.createElement('canvas');
-    let ctx = canvas.getContext('2d', { willReadFrequently: true, alpha: true });
+    let ctx = canvas.getContext('2d', { willReadFrequently: true, alpha: true })!;
     let img = new Image();
     img.src = src;
 
@@ -97,7 +122,7 @@ export async function getStealthExif(src) {
     ctx.drawImage(img, 0, 0);
 
     let imageData = ctx.getImageData(0, 0, img.width, img.height);
-    let lowestData = [];
+    let lowestData: number[] = [];
 
     for (let x = 0; x < img.width; x++) {
         for (let y = 0; y < img.height; y++) {
