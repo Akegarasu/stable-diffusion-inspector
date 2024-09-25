@@ -99,7 +99,7 @@ export const tryExtractSafetensorsMetaFull = async (file: File) => {
     let data = meta["__metadata__"]
     const jsonKeys = ["ss_bucket_info", "ss_network_args", "ss_dataset_dirs", "ss_tag_frequency"]
     for (let k of jsonKeys) {
-        if (data[k]) {
+        if (data[k] && data[k].length < 10000) {
             data[k] = JSON.parse(data[k])
         }
     }
