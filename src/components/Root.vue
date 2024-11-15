@@ -279,41 +279,47 @@ const inspectModel = async (file) => {
 
 
 const extractMetadata = async (file) => {
-  const buf = await file.arrayBuffer();
-  let chunks = [];
-  try {
-    chunks = extractChunks(new Uint8Array(buf));
-  } catch (err) {
-    return chunks;
-  }
-  const textChunks = chunks
-    .filter(function (chunk) {
-      return chunk.name === "tEXt" || chunk.name === "iTXt";
-    })
-    .map(function (chunk) {
-      if (chunk.name === "iTXt") {
-        let data = chunk.data.filter((x) => x != 0x0);
-        let header = new TextDecoder().decode(data.slice(0, 11));
-        if (header == "Description") {
-          data = data.slice(11);
-          let txt = new TextDecoder().decode(data);
-          return {
-            keyword: "Description",
-            text: txt,
-          };
+  if (file.type === "image/png") {
+    const buf = await file.arrayBuffer();
+    let chunks = [];
+    try {
+      chunks = extractChunks(new Uint8Array(buf));
+    } catch (err) {
+      return chunks;
+    }
+    const textChunks = chunks
+      .filter(function (chunk) {
+        return chunk.name === "tEXt" || chunk.name === "iTXt";
+      })
+      .map(function (chunk) {
+        if (chunk.name === "iTXt") {
+          let data = chunk.data.filter((x) => x != 0x0);
+          let header = new TextDecoder().decode(data.slice(0, 11));
+          if (header == "Description") {
+            data = data.slice(11);
+            let txt = new TextDecoder().decode(data);
+            return {
+              keyword: "Description",
+              text: txt,
+            };
+          } else {
+            let txt = new TextDecoder().decode(data);
+            return {
+              keyword: "Unknown",
+              text: txt,
+            };
+          }
         } else {
-          let txt = new TextDecoder().decode(data);
-          return {
-            keyword: "Unknown",
-            text: txt,
-          };
+          return text.decode(chunk.data);
         }
-      } else {
-        return text.decode(chunk.data);
-      }
-    });
-  console.log(textChunks);
-  return textChunks;
+      });
+    console.log(textChunks);
+    return textChunks;
+  } else if (file.type === "image/webp") {
+    const data = await ExifReader.load(file);
+    const metadata = String.fromCodePoint(...(data.UserComment.value)).replaceAll('\x00', '').slice(7);
+    return [{keyword: "parameters", text: metadata}];
+  }
 }
 
 async function readFileInfo(file) {
