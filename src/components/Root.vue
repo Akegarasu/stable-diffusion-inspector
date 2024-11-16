@@ -133,7 +133,7 @@ const jsonData = ref(null);
 const imageMaxSizeRef = ref(0);
 const { toClipboard } = useClipboard();
 
-const availableImgExt = ["png", "jpeg", "jpg", "webp", "bmp"]
+const availableImgExt = ["png", "jpeg", "jpg", "webp", "bmp", "avif"]
 const availableModelExt = ["pt", "pth", "ckpt", "safetensors", "bin"]
 
 const modelSig = {
@@ -315,7 +315,7 @@ const extractMetadata = async (file) => {
       });
     console.log(textChunks);
     return textChunks;
-  } else if (file.type === "image/webp") {
+  } else if (file.type === "image/webp" || file.type === "image/jpeg" || file.type === "image/avif") {
     const data = await ExifReader.load(file);
     const metadata = String.fromCodePoint(...(data.UserComment.value)).replaceAll('\x00', '').slice(7);
     return [{keyword: "parameters", text: metadata}];
