@@ -44,11 +44,11 @@ class DataReader {
     }
 }
 
-export const asyncFileReaderAsDataURL = (file) => {
+export const asyncFileReaderAsDataURL = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            resolve(e.target?.result);
+            resolve(e.target?.result as string);
         };
         reader.onerror = (e) => {
             reject(e);
@@ -86,7 +86,16 @@ export const tryExtractSafetensorsMeta = (content) => {
     return data;
 };
 
-export const tryExtractSafetensorsMetaFull = async (file: File) => {
+export const getSafetensorsMeta = async (file: File) => {
+    let buf = await file.slice(0, 8).arrayBuffer()
+    let dv = new DataView(buf, 0);
+    let metaLen = dv.getInt32(0, true)
+    let metaBuf = await file.slice(8, metaLen + 8).text()
+    let meta = JSON.parse(metaBuf)
+    return meta
+}
+
+export const getSafetensorsMetaKohya = async (file: File) => {
     let buf = await file.slice(0, 8).arrayBuffer()
     let dv = new DataView(buf, 0);
     let metaLen = dv.getInt32(0, true)

@@ -1,0 +1,70 @@
+{
+    "data": [
+        {
+            "name": "Embedding 模型",
+            "identifier": "embedding",
+            "sigs": [
+                "string_to_param",
+                "emb_params"
+            ]
+        },
+        {
+            "name": "FLUX.1 模型",
+            "identifier": "flux-1",
+            "sigs": [
+                "double_blocks.0.img_mlp.0.weight",
+                "guidance_in.in_layer.weight"
+            ]
+        },
+        {
+            "name": "Stable Diffusion 3 模型 (SD3)",
+            "identifier": "sd-3",
+            "sigs": [
+                "model.diffusion_model.joint_blocks.0.context_block.attn.proj.weight"
+            ]
+        },
+        {
+            "name": "Stable Diffusion XL 模型 (SDXL)",
+            "identifier": "sd-xl",
+            "sigs": [
+                "conditioner.embedders.1.model.transformer.resblocks"
+            ]
+        },
+        {
+            "name": "Stable Diffusion 1.5 模型 (SD1.5)",
+            "identifier": "sd-15",
+            "sigs": [
+                "model.diffusion_model."
+            ]
+        },
+        {
+            "name": "LoRA 模型 (SD1.5专用)",
+            "identifier": "lora-sd-15",
+            "sigs": [
+                "lora_te_text_model_encoder"
+            ]
+        },
+        {
+            "name": "LoRA 模型 (SDXL专用)",
+            "identifier": "lora-sd-xl",
+            "sigs": [
+                "lora_unet_input_blocks_4_1_transformer_blocks_0_attn1_to_k.lora_up.weight"
+            ]
+        },
+        {
+            "name": "VAE 模型",
+            "identifier": "vae",
+            "sigs": [
+                "encoder.down.0.block"
+            ]
+        },
+        {
+            "name": "Hypernetwork 模型",
+            "identifier": "hypernetwork",
+            "sigs": [
+                "linear.0.weight",
+                "linear1.weight"
+            ]
+        }
+    ]
+}

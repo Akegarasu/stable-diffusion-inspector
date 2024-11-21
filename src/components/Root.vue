@@ -108,18 +108,19 @@
 </style>
 
 <script setup lang="ts">
+import modelsig from '../assets/modelsig.json'
+
 import { ElMessage } from "element-plus";
 import ExifReader from "exifreader";
 import { ref, watch } from "vue";
 import prettyBytes from "pretty-bytes";
 import extractChunks from "png-chunks-extract";
-import text from "png-chunk-text";
+import * as pngChunkText from "png-chunk-text";
 import jsonViewer from "vue-json-viewer";
 import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
 
-import { asyncFileReaderAsDataURL, getStealthExif, tryExtractSafetensorsMeta, tryExtractSafetensorsMetaFull } from "../utils";
-import { he } from "element-plus/es/locale";
+import { asyncFileReaderAsDataURL, getStealthExif, getSafetensorsMeta, getSafetensorsMetaKohya } from "../utils";
 
 const imgFileRef = ref(null);
 const imageRef = ref(null);
@@ -136,27 +137,16 @@ const { toClipboard } = useClipboard();
 const availableImgExt = ["png", "jpeg", "jpg", "webp", "bmp", "avif"]
 const availableModelExt = ["pt", "pth", "ckpt", "safetensors", "bin"]
 
-const modelSig = {
-  string_to_param: "Embedding",
-  "conditioner.embedders.1.model.transformer.resblocks": "SDXL",
-  "model.diffusion_model.": "Stable Diffusion",
-  "cond_stage_model.transformer.": "Stable Diffusion",
-  lora_te_text_model_encoder: "LoRA",
-  lora_unet: "LoRA",
-  "encoder.down.0.block": "VAE",
-  "linear.0.weight": "Hypernetworks",
-  "linear1.weight": "Hypernetworks",
-};
-
 const modelUseGuide = {
-  "Stable Diffusion": "Stable Diffusion 1.5/2.0 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
-  "SDXL": "Stable Diffusion XL 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
-  VAE: "放入 models/VAE 文件夹后，在 webui 中的设置页面 - Stable Diffusion - 模型的 VAE 选择并保存",
-  LoRA: "放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。",
-  Hypernetworks:
-    "放入 models/hypernetworks 文件夹后，在 webui 中，提示词输入框下方，找到 hypernetworks 选项卡点击使用。",
-  Embedding:
-    "放入 embeddings 文件夹后，在 webui 中，提示词输入框下方，找到 embeddings 选项卡点击使用。",
+  "sd-15": "Stable Diffusion 1.5/2.0 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
+  "sd-xl": "Stable Diffusion XL 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
+  "sd-3": "Stable Diffusion 3 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
+  "flux-1": "FLUX.1 大模型。AUTOMATIC1111 SD-WebUI 暂时不支持 FLUX.1，请使用其他 SD-WebUI 版本。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
+  "vae": "放入 models/VAE 文件夹后，在 webui 的顶部，找到 VAE 下拉框，选择模型。",
+  "lora-sd-15": "LoRA 模型 (SD1.5专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SD-15 的 LoRA 需要使用 SD1.5 的大模型才能正常使用，否则不会显示。",
+  "lora-sd-xl": "LoRA 模型 (SDXL专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SDXL 的 LoRA 需要使用 SDXL 的大模型才能正常使用，否则不会显示。",
+  "hypernetwork": "放入 models/hypernetworks 文件夹后，在 webui 中，提示词输入框下方，找到 hypernetworks 选项卡点击使用。",
+  "embedding": "放入 embeddings 文件夹后，在 webui 中，提示词输入框下方，找到 embeddings 选项卡点击使用。",
 };
 
 const copy = (value) => {
@@ -234,45 +224,75 @@ const inspectImage = async (file) => {
 }
 
 const inspectModel = async (file) => {
-  const content = await file.slice(0, 1024 * 50).text()
-  console.log("[debug] file content: " + content)
-  let modelType = "";
-  let fileSize = file.size;
-  let fileExt = file.name.split(".").pop();
+  const modelTypes = modelsig.data
+  const fileSize = file.size
+  const fileExt = file.name.split(".").pop().toLowerCase()
+
   if (fileSize < 1024 * 10) {
-    fileInfoRef.value = [{ k: "错误", v: "文件可能不是模型" }];
+    modelFileInfoRef.value = [{ k: "错误", v: "🤔 文件过小，怀疑可能不是模型文件。停止解析。" }];
     return;
   }
 
-  if (fileSize < 1024 * 1024 && content.indexOf("string_to_param") != -1) {
-    modelType = "Embedding";
+  let modelType: {
+    name: string;
+    identifier: string;
+    sigs: string[];
+  };
+  let modelKeysContent = ""
+
+  if (fileExt == "safetensors") {
+    let meta: { [x: string]: any; };
+    try {
+      meta = await getSafetensorsMeta(file);
+    } catch (e) {
+      modelFileInfoRef.value = [{ k: "错误", v: "😈 你传了个什么玩意进来？解析失败，该文件可能不是一个正常的模型文件。停止解析。" }];
+      return;
+    }
+
+    if (meta["__metadata__"]) {
+      let data = meta["__metadata__"]
+
+      delete data["modelspec.thumbnail"]
+
+      const jsonKeys = ["ss_bucket_info", "ss_network_args", "ss_dataset_dirs", "ss_tag_frequency"]
+      for (let k of jsonKeys) {
+        if (data[k] && data[k].length < 10000) {
+          data[k] = JSON.parse(data[k])
+        }
+      }
+      jsonData.value = data;
+    }
+    const modelKeys = Object.keys(meta).filter(key => key != "__metadata__");
+    modelKeysContent = modelKeys.join("\n")
   } else {
-    for (let sig in modelSig) {
-      if (content.indexOf(sig) != -1) {
-        modelType = modelSig[sig];
-        break;
+    modelKeysContent = await file.slice(0, 1024 * 50).text()
+    console.log("[debug] file content: " + modelKeysContent)
+  }
+
+  for (let m of modelTypes) {
+    if (modelType) break;
+
+    for (let sig of m.sigs) {
+      if (modelKeysContent.indexOf(sig) != -1) {
+        modelType = m
+        break
       }
     }
   }
 
-  let modelTypeOk =
-    modelType == "" ? "未知模型种类或非模型" : modelType + " 模型";
+  let modelTypeOk = modelType == null ? "😭 未知模型种类或非模型 如果你坚信这是一个模型文件，请提交issue。" : modelType.name
   let ok = [
     { k: "文件名", v: file.name },
     { k: "文件大小", v: printableBytes(fileSize) },
     { k: "模型种类", v: modelTypeOk },
   ];
 
-  if (modelType != "") {
-    ok.push({ k: "模型用法", v: modelUseGuide[modelType] });
+  if (modelType != null) {
+    ok.push({ k: "模型用法", v: modelUseGuide[modelType.identifier] });
   }
 
-  if (fileExt == "safetensors") {
-    let ret = await tryExtractSafetensorsMetaFull(file);
-    if (ret) {
-      jsonData.value = ret;
-      ok.push({ k: "Info", v: jsonData });
-    }
+  if (fileExt == "safetensors" && jsonData.value) {
+    ok.push({ k: "Info", v: jsonData });
   }
   modelFileInfoRef.value = ok;
 }
@@ -310,7 +330,7 @@ const extractMetadata = async (file) => {
             };
           }
         } else {
-          return text.decode(chunk.data);
+          return pngChunkText.decode(chunk.data);
         }
       });
     console.log(textChunks);
@@ -318,7 +338,7 @@ const extractMetadata = async (file) => {
   } else if (file.type === "image/webp" || file.type === "image/jpeg" || file.type === "image/avif") {
     const data = await ExifReader.load(file);
     const metadata = String.fromCodePoint(...(data.UserComment.value)).replaceAll('\x00', '').slice(7);
-    return [{keyword: "parameters", text: metadata}];
+    return [{ keyword: "parameters", text: metadata }];
   }
 }
 
@@ -342,7 +362,7 @@ async function readFileInfo(file) {
     } else {
       return [{
         key: "提示",
-        value: "无法读取到图像 Metadata，这可能不是一张 Stable Diffusion 生成的图。或者不是原图, 经过了压缩。",
+        value: "😭 无法读取到图像 Metadata，这可能不是一张 Stable Diffusion 生成的图。或者不是原图, 经过了压缩。",
       }]
     }
   } else if (metadata.length == 1) {
@@ -373,7 +393,7 @@ async function readFileInfo(file) {
   if (parsed.length == 0) {
     ok.push({
       key: "提示",
-      value: "无法读取到图像 Metadata，这可能不是一张 Stable Diffusion 生成的图。或者不是原图, 经过了压缩。",
+      value: "😭 无法读取到图像 Metadata，这可能不是一张 Stable Diffusion 生成的图。或者不是原图, 经过了压缩。",
     })
   }
   return ok
