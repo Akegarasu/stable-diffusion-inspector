@@ -92,6 +92,8 @@
         <a class="text-gray-500" href="https://space.bilibili.com/12566101">秋葉aaaki</a>
         <a> | </a>
         <a class="text-gray-500" href="https://novelai.dev">NovelAI.Dev</a>
+        <a> | </a>
+        <a class="text-gray-500">Build: {{ commitHash }}</a>
       </span>
     </div>
   </div>
@@ -121,6 +123,8 @@ import { UploadFilled, CopyDocument } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
 
 import { asyncFileReaderAsDataURL, getStealthExif, getSafetensorsMeta, getSafetensorsMetaKohya } from "../utils";
+
+const commitHash = import.meta.env.VITE_COMMIT_HASH || "unknown"
 
 const imgFileRef = ref(null);
 const imageRef = ref(null);

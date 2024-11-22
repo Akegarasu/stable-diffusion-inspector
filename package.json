@@ -5,7 +5,7 @@
   "license": "GPL-v3",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "cross-env VITE_COMMIT_HASH=$(git rev-parse --short HEAD) vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "@types/file-saver": "^2.0.5",
     "@types/mime-types": "^2.1.1",
     "@vitejs/plugin-vue": "^3.0.0",
+    "cross-env": "^7.0.3",
     "unocss": "^0.44.7",
     "vite": "^3.1.0",
     "vite-plugin-pwa": "^0.13.3"

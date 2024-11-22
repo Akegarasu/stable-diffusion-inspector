@@ -56,16 +56,19 @@ importers:
         version: 2.1.1
       '@vitejs/plugin-vue':
         specifier: ^3.0.0
-        version: 3.0.1(vite@3.2.5)(vue@3.2.37)
+        version: 3.0.1(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2))(vue@3.2.37)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       unocss:
         specifier: ^0.44.7
-        version: 0.44.7(vite@3.2.5)
+        version: 0.44.7(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2))
       vite:
         specifier: ^3.1.0
-        version: 3.2.5
+        version: 3.2.5(@types/node@18.11.18)(terser@5.16.2)
       vite-plugin-pwa:
         specifier: ^0.13.3
-        version: 0.13.3(vite@3.2.5)(workbox-build@6.5.4)(workbox-window@6.5.4)
+        version: 0.13.3(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2))(workbox-build@6.5.4)(workbox-window@6.5.4)
 
 packages:
 
@@ -1046,6 +1049,11 @@ packages:
     resolution: {integrity: sha512-kucVIjOmMc1f0tv53BJ/5WIX+MGLcKuoBhnGqQrgKJNqLByb/sVMWfW/Aw6hw0jgcqjJ2pi9E5y32zOIpaUlsA==}
     engines: {node: '>=0.8'}
 
+  cross-env@7.0.3:
+    resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
+    engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
+    hasBin: true
+
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
@@ -1351,6 +1359,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   globals@11.12.0:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
@@ -1415,6 +1424,7 @@ packages:
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
@@ -3118,7 +3128,7 @@ snapshots:
     dependencies:
       '@unocss/core': 0.44.7
 
-  '@unocss/vite@0.44.7(vite@3.2.5)':
+  '@unocss/vite@0.44.7(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2))':
     dependencies:
       '@ampproject/remapping': 2.2.0
       '@rollup/pluginutils': 4.2.1
@@ -3128,11 +3138,11 @@ snapshots:
       '@unocss/scope': 0.44.7
       '@unocss/transformer-directives': 0.44.7
       magic-string: 0.26.2
-      vite: 3.2.5
+      vite: 3.2.5(@types/node@18.11.18)(terser@5.16.2)
 
-  '@vitejs/plugin-vue@3.0.1(vite@3.2.5)(vue@3.2.37)':
+  '@vitejs/plugin-vue@3.0.1(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2))(vue@3.2.37)':
     dependencies:
-      vite: 3.2.5
+      vite: 3.2.5(@types/node@18.11.18)(terser@5.16.2)
       vue: 3.2.37
 
   '@vue/compiler-core@3.2.37':
@@ -3367,6 +3377,10 @@ snapshots:
       browserslist: 4.21.5
 
   crc-32@0.3.0: {}
+
+  cross-env@7.0.3:
+    dependencies:
+      cross-spawn: 7.0.3
 
   cross-spawn@7.0.3:
     dependencies:
@@ -4284,7 +4298,7 @@ snapshots:
 
   universalify@2.0.0: {}
 
-  unocss@0.44.7(vite@3.2.5):
+  unocss@0.44.7(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2)):
     dependencies:
       '@unocss/cli': 0.44.7
       '@unocss/core': 0.44.7
@@ -4300,7 +4314,7 @@ snapshots:
       '@unocss/transformer-compile-class': 0.44.7
       '@unocss/transformer-directives': 0.44.7
       '@unocss/transformer-variant-group': 0.44.7
-      '@unocss/vite': 0.44.7(vite@3.2.5)
+      '@unocss/vite': 0.44.7(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2))
     transitivePeerDependencies:
       - supports-color
       - vite
@@ -4319,27 +4333,29 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite-plugin-pwa@0.13.3(vite@3.2.5)(workbox-build@6.5.4)(workbox-window@6.5.4):
+  vite-plugin-pwa@0.13.3(vite@3.2.5(@types/node@18.11.18)(terser@5.16.2))(workbox-build@6.5.4)(workbox-window@6.5.4):
     dependencies:
       '@rollup/plugin-replace': 4.0.0(rollup@2.79.1)
       debug: 4.3.4
       fast-glob: 3.2.11
       pretty-bytes: 6.0.0
       rollup: 2.79.1
-      vite: 3.2.5
+      vite: 3.2.5(@types/node@18.11.18)(terser@5.16.2)
       workbox-build: 6.5.4
       workbox-window: 6.5.4
     transitivePeerDependencies:
       - supports-color
 
-  vite@3.2.5:
+  vite@3.2.5(@types/node@18.11.18)(terser@5.16.2):
     dependencies:
       esbuild: 0.15.18
       postcss: 8.4.21
       resolve: 1.22.1
       rollup: 2.79.1
     optionalDependencies:
+      '@types/node': 18.11.18
       fsevents: 2.3.2
+      terser: 5.16.2
 
   vue-clipboard3@2.0.0:
     dependencies:
