@@ -3,6 +3,7 @@
         {
             "name": "Embedding 模型",
             "identifier": "embedding",
+            "usage": "放入 embeddings 文件夹后，在 webui 中，提示词输入框下方，找到 embeddings 选项卡点击使用。",
             "sigs": [
                 "string_to_param",
                 "emb_params"
@@ -11,6 +12,7 @@
         {
             "name": "FLUX.1 模型",
             "identifier": "flux-1",
+            "usage": "FLUX.1 大模型。AUTOMATIC1111 SD-WebUI 暂时不支持 FLUX.1，请使用其他 SD-WebUI 版本。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
             "sigs": [
                 "double_blocks.0.img_mlp.0.weight",
                 "guidance_in.in_layer.weight"
@@ -19,6 +21,7 @@
         {
             "name": "Stable Diffusion 3 模型 (SD3)",
             "identifier": "sd-3",
+            "usage": "Stable Diffusion 3 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
             "sigs": [
                 "model.diffusion_model.joint_blocks.0.context_block.attn.proj.weight"
             ]
@@ -26,6 +29,7 @@
         {
             "name": "Stable Diffusion XL 模型 (SDXL)",
             "identifier": "sd-xl",
+            "usage": "Stable Diffusion XL 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
             "sigs": [
                 "conditioner.embedders.1.model.transformer.resblocks"
             ]
@@ -33,13 +37,31 @@
         {
             "name": "Stable Diffusion 1.5 模型 (SD1.5)",
             "identifier": "sd-15",
+            "usage": "Stable Diffusion 1.5/2.0 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
             "sigs": [
                 "model.diffusion_model."
             ]
         },
         {
+            "name": "CLIP-G 模型",
+            "identifier": "clip-g",
+            "usage": "CLIP-G 文本编码器模型。放入 models/CLIP 文件夹。",
+            "sigs": [
+                "text_model.encoder.layers.26.self_attn.k_proj.bias"
+            ]
+        },
+        {
+            "name": "T5xxl 模型",
+            "identifier": "t5xxl",
+            "usage": "t5xxl 文本编码器模型。放入 models/CLIP 文件夹。",
+            "sigs": [
+                "encoder.block.0.layer.0.SelfAttention.k.weight"
+            ]
+        },
+        {
             "name": "LoRA 模型 (SDXL专用)",
             "identifier": "lora-sd-xl",
+            "usage": "LoRA 模型 (SDXL专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SDXL 的 LoRA 需要使用 SDXL 的大模型才能正常使用，否则不会显示。",
             "sigs": [
                 "lora_unet_input_blocks_4_1_transformer_blocks_0_attn1_to_k.lora_up.weight"
             ]
@@ -47,6 +69,7 @@
         {
             "name": "LoRA 模型 (SD1.5专用)",
             "identifier": "lora-sd-15",
+            "usage": "LoRA 模型 (SD1.5专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SD-15 的 LoRA 需要使用 SD1.5 的大模型才能正常使用，否则不会显示。",
             "sigs": [
                 "lora_te_text_model_encoder"
             ]
@@ -54,6 +77,7 @@
         {
             "name": "VAE 模型",
             "identifier": "vae",
+            "usage": "放入 models/VAE 文件夹后，在 webui 的顶部，找到 VAE 下拉框，选择模型。",
             "sigs": [
                 "encoder.down.0.block"
             ]
@@ -61,9 +85,18 @@
         {
             "name": "Hypernetwork 模型",
             "identifier": "hypernetwork",
+            "usage": "放入 models/hypernetworks 文件夹后，在 webui 中，提示词输入框下方，找到 hypernetworks 选项卡点击使用。",
             "sigs": [
                 "linear.0.weight",
                 "linear1.weight"
+            ]
+        },
+        {
+            "name": "RealESRGAN 模型",
+            "identifier": "r-esrgan",
+            "usage": "这是一个 RealESRGAN 模型，用于超分辨率图像处理。放置于 models/RealESRGAN 目录下。",
+            "sigs": [
+                "body.0.rdb1.conv1.weightq"
             ]
         }
     ]

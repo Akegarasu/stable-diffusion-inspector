@@ -141,18 +141,6 @@ const { toClipboard } = useClipboard();
 const availableImgExt = ["png", "jpeg", "jpg", "webp", "bmp", "avif"]
 const availableModelExt = ["pt", "pth", "ckpt", "safetensors", "bin"]
 
-const modelUseGuide = {
-  "sd-15": "Stable Diffusion 1.5/2.0 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
-  "sd-xl": "Stable Diffusion XL 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
-  "sd-3": "Stable Diffusion 3 大模型。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
-  "flux-1": "FLUX.1 大模型。AUTOMATIC1111 SD-WebUI 暂时不支持 FLUX.1，请使用其他 SD-WebUI 版本。放入 models/Stable-diffusion 文件夹后，进入 webui 在左上角点击刷新后选择模型。",
-  "vae": "放入 models/VAE 文件夹后，在 webui 的顶部，找到 VAE 下拉框，选择模型。",
-  "lora-sd-15": "LoRA 模型 (SD1.5专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SD-15 的 LoRA 需要使用 SD1.5 的大模型才能正常使用，否则不会显示。",
-  "lora-sd-xl": "LoRA 模型 (SDXL专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SDXL 的 LoRA 需要使用 SDXL 的大模型才能正常使用，否则不会显示。",
-  "hypernetwork": "放入 models/hypernetworks 文件夹后，在 webui 中，提示词输入框下方，找到 hypernetworks 选项卡点击使用。",
-  "embedding": "放入 embeddings 文件夹后，在 webui 中，提示词输入框下方，找到 embeddings 选项卡点击使用。",
-};
-
 const copy = (value) => {
   try {
     toClipboard(value);
@@ -240,6 +228,7 @@ const inspectModel = async (file) => {
   let modelType: {
     name: string;
     identifier: string;
+    usage: string;
     sigs: string[];
   };
   let modelKeysContent = ""
@@ -292,7 +281,7 @@ const inspectModel = async (file) => {
   ];
 
   if (modelType != null) {
-    ok.push({ k: "模型用法", v: modelUseGuide[modelType.identifier] });
+    ok.push({ k: "模型用法", v: modelType.usage });
   }
 
   if (fileExt == "safetensors" && jsonData.value) {
