@@ -38,17 +38,17 @@
             ]
         },
         {
-            "name": "LoRA 模型 (SD1.5专用)",
-            "identifier": "lora-sd-15",
-            "sigs": [
-                "lora_te_text_model_encoder"
-            ]
-        },
-        {
             "name": "LoRA 模型 (SDXL专用)",
             "identifier": "lora-sd-xl",
             "sigs": [
                 "lora_unet_input_blocks_4_1_transformer_blocks_0_attn1_to_k.lora_up.weight"
+            ]
+        },
+        {
+            "name": "LoRA 模型 (SD1.5专用)",
+            "identifier": "lora-sd-15",
+            "sigs": [
+                "lora_te_text_model_encoder"
             ]
         },
         {
