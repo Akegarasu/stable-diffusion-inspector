@@ -60,9 +60,10 @@
         },
         {
             "name": "LoRA 模型 (SDXL专用)",
-            "identifier": "lora-sd-xl",
+            "identifier": "stable-diffusion-xl-v1-base/lora",
             "usage": "LoRA 模型 (SDXL专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SDXL 的 LoRA 需要使用 SDXL 的大模型才能正常使用，否则不会显示。",
             "sigs": [
+                "lora_unet_input_blocks_4_1_transformer_blocks_0_attn1_to_k.alpha",
                 "lora_unet_input_blocks_4_1_transformer_blocks_0_attn1_to_k.lora_up.weight"
             ]
         },

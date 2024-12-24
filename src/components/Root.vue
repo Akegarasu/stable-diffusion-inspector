@@ -230,13 +230,15 @@ const inspectModel = async (file) => {
     identifier: string;
     usage: string;
     sigs: string[];
-  };
+  }
+  let knownIdentifier = modelTypes.map(x => x.identifier)
   let modelKeysContent = ""
+  let metaJson
 
   if (fileExt == "safetensors") {
-    let meta: { [x: string]: any; };
+    let meta: { [x: string]: any; }
     try {
-      meta = await getSafetensorsMeta(file);
+      meta = await getSafetensorsMeta(file)
     } catch (e) {
       modelFileInfoRef.value = [{ k: "错误", v: "😈 你传了个什么玩意进来？解析失败，该文件可能不是一个正常的模型文件。停止解析。" }];
       return;
@@ -253,7 +255,8 @@ const inspectModel = async (file) => {
           data[k] = JSON.parse(data[k])
         }
       }
-      jsonData.value = data;
+      metaJson = data
+      jsonData.value = data
     }
     const modelKeys = Object.keys(meta).filter(key => key != "__metadata__");
     modelKeysContent = modelKeys.join("\n")
@@ -262,13 +265,17 @@ const inspectModel = async (file) => {
     console.log("[debug] file content: " + modelKeysContent)
   }
 
-  for (let m of modelTypes) {
-    if (modelType) break;
+  if (knownIdentifier.indexOf(metaJson["modelspec.architecture"]) != -1) {
+    modelType = modelTypes.find(x => x.identifier == metaJson["modelspec.architecture"])
+  } else {
+    for (let m of modelTypes) {
+      if (modelType) break;
 
-    for (let sig of m.sigs) {
-      if (modelKeysContent.indexOf(sig) != -1) {
-        modelType = m
-        break
+      for (let sig of m.sigs) {
+        if (modelKeysContent.indexOf(sig) != -1) {
+          modelType = m
+          break
+        }
       }
     }
   }
