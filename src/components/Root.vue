@@ -260,12 +260,13 @@ const inspectModel = async (file) => {
     }
     const modelKeys = Object.keys(meta).filter(key => key != "__metadata__");
     modelKeysContent = modelKeys.join("\n")
+    console.log(modelKeysContent)
   } else {
     modelKeysContent = await file.slice(0, 1024 * 50).text()
     console.log("[debug] file content: " + modelKeysContent)
   }
 
-  if (knownIdentifier.indexOf(metaJson["modelspec.architecture"]) != -1) {
+  if (metaJson && metaJson["modelspec.architecture"] && knownIdentifier.indexOf(metaJson["modelspec.architecture"]) != -1) {
     modelType = modelTypes.find(x => x.identifier == metaJson["modelspec.architecture"])
   } else {
     for (let m of modelTypes) {

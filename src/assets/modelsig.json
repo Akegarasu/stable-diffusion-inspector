@@ -51,11 +51,27 @@
             ]
         },
         {
+            "name": "CLIP-L 模型",
+            "identifier": "clip-l",
+            "usage": "CLIP-L 文本编码器模型。放入 models/CLIP 文件夹。",
+            "sigs": [
+                "text_model.final_layer_norm.bias"
+            ]
+        },
+        {
             "name": "T5xxl 模型",
             "identifier": "t5xxl",
             "usage": "t5xxl 文本编码器模型。放入 models/CLIP 文件夹。",
             "sigs": [
                 "encoder.block.0.layer.0.SelfAttention.k.weight"
+            ]
+        },
+        {
+            "name": "BLIP 模型",
+            "identifier": "blip",
+            "usage": "BLIP 文本编码器模型。放入 models/BLIP 文件夹。",
+            "sigs": [
+                "text_decoder.bert.encoder.layer."
             ]
         },
         {
@@ -72,7 +88,8 @@
             "identifier": "lora-sd-15",
             "usage": "LoRA 模型 (SD1.5专用)。放入 models/Lora 文件夹后，在 webui 中，提示词输入框下方，找到 Lora 选项卡点击使用。注意，SD-15 的 LoRA 需要使用 SD1.5 的大模型才能正常使用，否则不会显示。",
             "sigs": [
-                "lora_te_text_model_encoder"
+                "lora_te_text_model_encoder",
+                "lora_unet_up_blocks"
             ]
         },
         {
